@@ -16,6 +16,8 @@ import (
 var (
 	Mongoclient        *mongo.Client
 	Ctx                context.Context
+	cancel             context.CancelFunc
+	err                error
 	CustomerCollection *mongo.Collection
 	DriverCollection   *mongo.Collection
 	OrderCollection    *mongo.Collection
@@ -24,11 +26,11 @@ var (
 
 func ConnectDB() {
 	Ctx = context.TODO()
-	Mongoclient, err := mongo.NewClient(options.Client().ApplyURI(os.Getenv("DB_URI")))
+	Mongoclient, err = mongo.NewClient(options.Client().ApplyURI(os.Getenv("DB_URI")))
 	if err != nil {
 		log.Fatal(err)
 	}
-	Ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	Ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	err = Mongoclient.Connect(Ctx)
 	if err != nil {
@@ -56,7 +58,12 @@ func ConnectDB() {
 	CreateIndex("given_name", DriverCollection)
 	CreateIndex("business_name", MerchantCollection)
 	CreateIndex("phone_number", MerchantCollection)
+}
+func CloseDB() error {
+	// Ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	err := Mongoclient.Disconnect(Ctx)
 
+	return err
 }
 func CreateIndex(name string, Collection *mongo.Collection) {
 	_, err := Collection.Indexes().CreateOne(
