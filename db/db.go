@@ -38,6 +38,11 @@ func ConnectDB() {
 	if err != nil {
 		log.Fatal("error while trying to ping mongo", err)
 	}
+	// dbList, err := Mongoclient.ListDatabaseNames(Ctx, bson.D{})
+	// if err != nil {
+	// 	fmt.Println("error while trying to list database names", err)
+	// }
+	// fmt.Println(dbList)
 	fmt.Println("mongo connection established")
 	ResturantDB := Mongoclient.Database("resturant")
 
