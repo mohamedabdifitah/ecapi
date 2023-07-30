@@ -1,6 +1,8 @@
 package db
 
 import (
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -34,8 +36,8 @@ type Coupon struct {
 	TimeOperatorEnd   primitive.DateTime `bson:"operation_time_end" json:"operation_time_end"`     // Datetime End coupon expires
 }
 type Metadata struct {
-	CreatedAt primitive.DateTime `json:"created_at" bson:"created_at"`
-	UpdatedAt primitive.DateTime `json:"updated_at" bson:"updated"`
+	CreatedAt time.Time `json:"created_at" bson:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" bson:"updated"`
 }
 type Item struct {
 	ItemExternalId string `json:"item_external_id" bson:"item_external_id"`
@@ -61,8 +63,14 @@ type Customer struct {
 	Id         primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Email      string             `bson:"email,omitempty" json:"email"`
 	FamilyName string             `bson:"family_name,omitempty" json:"family_name,omitempty"`
-	Username   string             `bson:"username" json:"username"`
+	GivenName  string             `bson:"given_name" json:"given_name"`
+	Metadata   Metadata           `bson:"metadata" json:"metadata"`
 	Password   string             `bson:"password" json:"-"`
+}
+type AccountMetadata struct {
+	Metadata
+	LasLogin time.Time `bson:"LasLogin" json:"lasLogin"`
+	Provider string    `bson:"provider" json:"provider"` // google , email , facebook
 }
 type Setting struct {
 	ReceiveNotification bool `bson:"receive_notification,omitempty" json:"receive_notification"`

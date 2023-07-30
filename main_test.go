@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"github.com/mohamedabdifitah/ecapi/db"
 )
 
 func TestMain(m *testing.M) {
@@ -17,8 +16,5 @@ func TestMain(m *testing.M) {
 		}
 
 	}
-	db.ConnectDB()
-	// api.Initserver()
 	m.Run()
-	db.CloseDB()
 }

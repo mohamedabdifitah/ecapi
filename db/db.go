@@ -30,7 +30,7 @@ func ConnectDB() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	Ctx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
+	Ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	err = Mongoclient.Connect(Ctx)
 	if err != nil {
@@ -51,7 +51,6 @@ func ConnectDB() {
 	CustomerCollection = ResturantDB.Collection("customer")
 	DriverCollection = ResturantDB.Collection("driver")
 	MerchantCollection = ResturantDB.Collection("merchant")
-	CreateIndex("username", CustomerCollection)
 	CreateIndex("email", CustomerCollection)
 	CreateIndex("email", DriverCollection)
 	CreateIndex("phone", DriverCollection)

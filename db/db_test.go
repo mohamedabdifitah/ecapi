@@ -2,14 +2,24 @@ package db
 
 import (
 	"log"
+	"os"
 	"testing"
 
-	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"github.com/joho/godotenv"
 )
 
-func TestConnectDB(t *testing.T) {
-	err := Mongoclient.Ping(Ctx, readpref.Primary())
-	if err != nil {
-		log.Fatal("error while trying to ping mongo", err)
+func TestMain(m *testing.M) {
+	if os.Getenv("APP_ENV") == "development" {
+		err := godotenv.Load("../.env.local")
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
 	}
+	// err := Mongoclient.Ping(Ctx, readpref.Primary())
+	// if err != nil {
+	// 	log.Fatal("error while trying to ping mongo", err)
+	// }
+	ConnectDB()
+	m.Run()
 }

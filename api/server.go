@@ -18,9 +18,9 @@ var (
 func Initserver() {
 	server = gin.New()
 	port := os.Getenv("PORT")
+	server.Use(gin.Recovery(), gin.Logger())
 	if os.Getenv("GIN_MODE") == "release" {
 		server.Run(fmt.Sprintf(":" + port)) // listen
-
 	}
 	InitRoutes(server)
 	// this is fix for windows defender popup

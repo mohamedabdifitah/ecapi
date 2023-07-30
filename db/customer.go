@@ -1,6 +1,8 @@
 package db
 
 import (
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -13,6 +15,8 @@ func (c *Customer) BeforeSave() error {
 		return err
 	}
 	c.Password = string(hashedPassword)
+	c.Metadata.CreatedAt = time.Now().UTC()
+	c.Metadata.UpdatedAt = time.Now().UTC()
 	return nil
 }
 func (c *Customer) Save() (*mongo.InsertOneResult, error) {
@@ -43,4 +47,23 @@ func (c *Customer) Delete() (*mongo.DeleteResult, error) {
 		return nil, err
 	}
 	return result, nil
+}
+func (c *Customer) GetAll() ([]*Customer, error) {
+	var customers []*Customer
+	cursor, err := CustomerCollection.Find(Ctx, bson.D{}, options.Find().SetProjection(ProtectFields("password", "devices")))
+	if err != nil {
+		return nil, err
+	}
+	for cursor.Next(Ctx) {
+		var customer *Customer
+		err := cursor.Decode(&customer)
+		if err != nil {
+
+			return nil, err
+
+		}
+		customers = append(customers, customer)
+	}
+	cursor.Close(Ctx)
+	return customers, nil
 }
