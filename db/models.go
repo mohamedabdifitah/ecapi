@@ -64,11 +64,11 @@ type Customer struct {
 	Password   string             `bson:"password" json:"-"`
 }
 type AccountMetadata struct {
-	TokenVersion string    `bson:"token_version" json:"token_version"`
+	TokenVersion string    `bson:"token_version" json:"-"`
 	CreatedAt    time.Time `json:"created_at" bson:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at" bson:"updated_at"`
-	LasLogin     time.Time `bson:"LasLogin" json:"lasLogin"`
-	Provider     string    `bson:"provider" json:"provider"` // google , email , facebook
+	LasLogin     time.Time `bson:"Last_login" json:"last_login"`
+	Provider     string    `bson:"provider" json:"-"` // google , email , facebook
 }
 type Setting struct {
 	ReceiveNotification bool `bson:"receive_notification,omitempty" json:"receive_notification"`

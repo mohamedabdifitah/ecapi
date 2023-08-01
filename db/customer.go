@@ -37,7 +37,7 @@ func (c *Customer) GetById() error {
 	query := bson.M{"_id": c.Id}
 	result := CustomerCollection.FindOne(
 		Ctx, query, options.FindOne().SetProjection(
-			ProtectFields("password", "devices"),
+			ProtectFields("password", "devices", "metadata.token_version", "metadata.provider"),
 		))
 	err := result.Decode(&c)
 	return err
@@ -52,7 +52,7 @@ func (c *Customer) Delete() (*mongo.DeleteResult, error) {
 }
 func (c *Customer) GetAll() ([]*Customer, error) {
 	var customers []*Customer
-	cursor, err := CustomerCollection.Find(Ctx, bson.D{}, options.Find().SetProjection(ProtectFields("password", "devices")))
+	cursor, err := CustomerCollection.Find(Ctx, bson.D{}, options.Find().SetProjection(ProtectFields("password", "devices", "metadata.token_version", "metadata.provider")))
 	if err != nil {
 		return nil, err
 	}
@@ -111,4 +111,13 @@ func (c *Customer) ChangePassword(OldPassword string, NewPassword string) *Error
 		return &ErrorResponse{Status: 500, Message: err}
 	}
 	return nil
+}
+func (c *Customer) ChangeEmail(OldEmail string, NewEmail string) (*mongo.UpdateResult, *ErrorResponse) {
+	filter := bson.M{"_id": c.Id, "email": OldEmail}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "email", Value: NewEmail}}}}
+	res, err := CustomerCollection.UpdateOne(Ctx, filter, update)
+	if err != nil {
+		return nil, &ErrorResponse{Status: 500, Message: err}
+	}
+	return res, nil
 }

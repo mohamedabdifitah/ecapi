@@ -12,6 +12,7 @@ func CustomerRouteDefinition() {
 	CustomerRouter.GET("/get/:id", controller.GetCustomer)
 	CustomerRouter.PUT("/update/:id", controller.UpdateCustomer)
 	CustomerRouter.PATCH("/change/password/:id", controller.ChangeCustomerPassword)
+	CustomerRouter.PATCH("/change/email/:id", controller.ChangeCustomerEmail)
 	CustomerRouter.DELETE("/delete/:id", controller.DeleteCustomer)
 	CustomerRouter.POST("/singup/email", controller.SingUpCustomerWithEmail)
 }

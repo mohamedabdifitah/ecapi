@@ -14,3 +14,7 @@ type ChangePasswordBody struct {
 	NewPassword string `json:"new_password"`
 	OldPassword string `json:"old_password"`
 }
+type ChangeEmaildBody struct {
+	OldEmail string `json:"old_email"`
+	NewEmail string `json:"new_email"`
+}

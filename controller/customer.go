@@ -62,6 +62,7 @@ func UpdateCustomer(c *gin.Context) {
 	objecId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.String(400, "Invalid customer id")
+		return
 	}
 	err = c.ShouldBindJSON(&body)
 	if err != nil {
@@ -78,6 +79,7 @@ func UpdateCustomer(c *gin.Context) {
 	res, err := customer.Update()
 	if err != nil {
 		c.JSON(500, err)
+		return
 	}
 	c.JSON(200, res)
 
@@ -106,10 +108,12 @@ func ChangeCustomerPassword(c *gin.Context) {
 	objecId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.String(400, "invalid id")
+		return
 	}
 	err = c.ShouldBindJSON(&body)
 	if err != nil {
 		c.JSON(400, err)
+		return
 	}
 	customer := db.Customer{
 		Id: objecId,
@@ -117,7 +121,32 @@ func ChangeCustomerPassword(c *gin.Context) {
 	res := customer.ChangePassword(body.OldPassword, body.NewPassword)
 	if res != nil {
 		res.Error(c)
-		return
 	}
 	c.String(200, "successfully changed password")
+}
+func ChangeCustomerEmail(c *gin.Context) {
+	var id string = c.Param("id")
+	var body *ChangeEmaildBody
+	objecId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.String(400, "invalid id")
+		return
+	}
+	err = c.ShouldBindJSON(&body)
+	if err != nil {
+		c.JSON(400, err)
+		return
+	}
+	customer := db.Customer{
+		Id: objecId,
+	}
+	res, ErrorResponse := customer.ChangeEmail(body.OldEmail, body.NewEmail)
+	if ErrorResponse != nil {
+		ErrorResponse.Error(c)
+	}
+	if res.ModifiedCount == 0 {
+		c.String(200, "email not found")
+		return
+	}
+	c.String(200, "email updated successfully")
 }
