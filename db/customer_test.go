@@ -18,7 +18,8 @@ func TestSave(t *testing.T) {
 
 }
 func TestGetById(t *testing.T) {
-
+	customer := Customer{}
+	customer.GetById()
 }
 func TestGetAll(t *testing.T) {
 

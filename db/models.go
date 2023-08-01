@@ -14,30 +14,24 @@ type Attributes struct {
 	Length primitive.Decimal128 `bson:"length" json:"length"`
 }
 
-type Reciepe struct {
-	Id                 primitive.ObjectID ` bson:"_id,omitempty" json:"id,omitempty"`       // 63f642ac061b6f5f089b3a65
-	Title              string             `json:"title" bson:"title" binding:"max=4,min=1"` // Burger
-	Description        string             `json:"description" bson:"description"`           // Chicken fries contains
-	Status             string             `json:"status" bson:"status"`                     // available , unavailable , banned
-	Type               string             `json:"type" bson:"type"`                         //
-	Category           string             `json:"category" bson:"category"`                 // fast food , drink ,
-	Images             []string           `json:"image" bson:"image"`                       // Images of the product urls
-	Price              uint               `json:"price" bson:"price"`                       // the price of the product is represented as cents 99 = $0.99
-	Attributes         Attributes         `json:"attributes" bson:"attributes"`
-	Metadata           Metadata           `json:"metadata" bson:"metadata"`
-	Discount           uint               `json:"-" bson:"discount"` // 10%
-	MerchantExternalId string             `json:"merchant_external_id" bson:"merchant_external_id"`
-	Barcode            string             `json:"-" bson:"-"` // if this needed
-}
-type Coupon struct {
-	Token             string             `json:"token" bson:"token"`
-	Rate              uint               `json:"rate" bson:"rate"`                                 // percentage of the discount
-	TimeOperatorStart primitive.DateTime `bson:"operation_time_start" json:"operation_time_start"` // Datetime Started
-	TimeOperatorEnd   primitive.DateTime `bson:"operation_time_end" json:"operation_time_end"`     // Datetime End coupon expires
+type Menu struct {
+	Id                  primitive.ObjectID ` bson:"_id,omitempty" json:"id,omitempty"`       // 63f642ac061b6f5f089b3a65
+	Title               string             `json:"title" bson:"title" binding:"max=4,min=1"` // Burger
+	Description         string             `json:"description" bson:"description"`           // Chicken fries contains
+	Status              string             `json:"status" bson:"status"`                     // available , unavailable , banned
+	Category            string             `json:"category" bson:"category"`                 // fast food , drink ,
+	Images              []string           `json:"image" bson:"image"`                       // Images of the product urls
+	Price               uint               `json:"price" bson:"price"`                       // the price of the product is represented as cents 99 = $0.99
+	Attributes          Attributes         `json:"attributes" bson:"attributes"`
+	Metadata            Metadata           `json:"metadata" bson:"metadata"`
+	Discount            uint               `json:"-" bson:"discount"` // 10%
+	ResturantExternalId string             `json:"resturant_external_id" bson:"resturant_external_id"`
+	Reciepe             []string           `json:"reciepe" bson:"reciepe"`
+	Barcode             string             `json:"-" bson:"barcode"` // if this needed
 }
 type Metadata struct {
 	CreatedAt time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" bson:"updated"`
+	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
 }
 type Item struct {
 	ItemExternalId string `json:"item_external_id" bson:"item_external_id"`
@@ -64,13 +58,17 @@ type Customer struct {
 	Email      string             `bson:"email,omitempty" json:"email"`
 	FamilyName string             `bson:"family_name,omitempty" json:"family_name,omitempty"`
 	GivenName  string             `bson:"given_name" json:"given_name"`
-	Metadata   Metadata           `bson:"metadata" json:"metadata"`
+	Address    string             `bson:"address" json:"address"`
+	Metadata   AccountMetadata    `bson:"metadata" json:"metadata"`
+	Profile    string             `bson:"profile" json:"profile"`
 	Password   string             `bson:"password" json:"-"`
 }
 type AccountMetadata struct {
-	Metadata
-	LasLogin time.Time `bson:"LasLogin" json:"lasLogin"`
-	Provider string    `bson:"provider" json:"provider"` // google , email , facebook
+	TokenVersion string    `bson:"token_version" json:"token_version"`
+	CreatedAt    time.Time `json:"created_at" bson:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at" bson:"updated_at"`
+	LasLogin     time.Time `bson:"LasLogin" json:"lasLogin"`
+	Provider     string    `bson:"provider" json:"provider"` // google , email , facebook
 }
 type Setting struct {
 	ReceiveNotification bool `bson:"receive_notification,omitempty" json:"receive_notification"`
@@ -87,7 +85,7 @@ type Driver struct {
 	Age       primitive.DateTime `json:"age" bson:"age"`
 	Address   string             `json:"address" bson:"address"`
 }
-type Merchant struct {
+type Resturant struct {
 	Id                primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65
 	BusinessName      string             `bson:"business_name" json:"business_name"`
 	Location          []float64          `bson:"location" json:"location"`
@@ -106,4 +104,14 @@ type Review struct {
 	Type       string   `bson:"type" json:"type"` // REVIEW_PRODUCT , REVIEW_DRIVER . REVIEW_MERCHANT
 	ExternalId string   `bson:"external_id" json:"external_id"`
 	Metadata   Metadata `bson:"metadata" json:"metadata"`
+}
+type Coupon struct {
+	Token             string             `json:"token" bson:"token"`
+	Rate              uint               `json:"rate" bson:"rate"`                                 // percentage of the discount
+	TimeOperatorStart primitive.DateTime `bson:"operation_time_start" json:"operation_time_start"` // Datetime Started
+	TimeOperatorEnd   primitive.DateTime `bson:"operation_time_end" json:"operation_time_end"`     // Datetime End coupon expires
+}
+type Otp struct {
+	Code  string `bson:"code" json:"code"`
+	Phone string `bson:"phone" json:"phone"`
 }
