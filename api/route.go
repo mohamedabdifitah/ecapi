@@ -15,4 +15,5 @@ func CustomerRouteDefinition() {
 	CustomerRouter.PATCH("/change/email/:id", controller.ChangeCustomerEmail)
 	CustomerRouter.DELETE("/delete/:id", controller.DeleteCustomer)
 	CustomerRouter.POST("/singup/email", controller.SingUpCustomerWithEmail)
+	CustomerRouter.POST("/signin/email", controller.CustomerEmailLogin)
 }

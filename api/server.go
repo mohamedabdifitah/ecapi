@@ -8,11 +8,13 @@ import (
 )
 
 var (
-	server          *gin.Engine
-	CustomerRouter  *gin.RouterGroup
-	OrderRouter     *gin.RouterGroup
-	ResturantRouter *gin.RouterGroup
-	DriverRouter    *gin.RouterGroup
+	server         *gin.Engine
+	CustomerRouter *gin.RouterGroup
+	OrderRouter    *gin.RouterGroup
+	MerchantRouter *gin.RouterGroup
+	DriverRouter   *gin.RouterGroup
+	ReviewRouter   *gin.RouterGroup
+	Router   *gin.RouterGroup
 )
 
 func Initserver() {
@@ -31,7 +33,7 @@ func InitRoutes(server *gin.Engine) {
 	path.BasePath()
 	CustomerRouter = path.Group("/customer")
 	DriverRouter = path.Group("/driver")
-	ResturantRouter = path.Group("/resturant")
+	MerchantRouter = path.Group("/merchant")
 	OrderRouter = path.Group("/order")
 	RouterDefinition()
 }
