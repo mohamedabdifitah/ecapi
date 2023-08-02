@@ -14,16 +14,16 @@ import (
 )
 
 var (
-	Mongoclient         *mongo.Client
-	Ctx                 context.Context
-	cancel              context.CancelFunc
-	err                 error
-	CustomerCollection  *mongo.Collection
-	DriverCollection    *mongo.Collection
-	OrderCollection     *mongo.Collection
-	ResturantCollection *mongo.Collection
-	MenuCollection      *mongo.Collection
-	ReviewCollection    *mongo.Collection
+	Mongoclient        *mongo.Client
+	Ctx                context.Context
+	cancel             context.CancelFunc
+	err                error
+	CustomerCollection *mongo.Collection
+	DriverCollection   *mongo.Collection
+	OrderCollection    *mongo.Collection
+	MerchantCollection *mongo.Collection
+	MenuCollection     *mongo.Collection
+	ReviewCollection   *mongo.Collection
 )
 
 func ConnectDB() {
@@ -52,15 +52,15 @@ func ConnectDB() {
 
 	CustomerCollection = ResturantDB.Collection("customer")
 	DriverCollection = ResturantDB.Collection("driver")
-	ResturantCollection = ResturantDB.Collection("resturant")
+	MerchantCollection = ResturantDB.Collection("merchant")
 	MenuCollection = ResturantDB.Collection("menu")
 	ReviewCollection = ResturantDB.Collection("review")
 	CreateIndex("email", CustomerCollection)
 	CreateIndex("email", DriverCollection)
 	CreateIndex("phone", DriverCollection)
 	CreateIndex("given_name", DriverCollection)
-	CreateIndex("business_name", ResturantCollection)
-	CreateIndex("phone_number", ResturantCollection)
+	CreateIndex("business_name", MerchantCollection)
+	CreateIndex("phone_number", MerchantCollection)
 	CreateIndex("barcode", MenuCollection)
 }
 func CloseDB() error {

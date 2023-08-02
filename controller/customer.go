@@ -121,6 +121,7 @@ func ChangeCustomerPassword(c *gin.Context) {
 	res := customer.ChangePassword(body.OldPassword, body.NewPassword)
 	if res != nil {
 		res.Error(c)
+		return
 	}
 	c.String(200, "successfully changed password")
 }
@@ -149,4 +150,22 @@ func ChangeCustomerEmail(c *gin.Context) {
 		return
 	}
 	c.String(200, "email updated successfully")
+}
+func CustomerEmailLogin(c *gin.Context) {
+	var body *EmailLoginBody
+	err := c.ShouldBindJSON(&body)
+	if err != nil {
+		c.JSON(400, err)
+		return
+	}
+	device := db.Device{
+		DeviceId: c.GetHeader("device_id"),
+		Kind:     c.GetHeader("device_kind"),
+	}
+	tokens, ErrorResponse := db.CustomerLoginCheck(body.Email, body.Password, device)
+	if ErrorResponse != nil {
+		ErrorResponse.Error(c)
+		return
+	}
+	c.JSON(200, tokens)
 }

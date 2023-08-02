@@ -121,3 +121,65 @@ func (c *Customer) ChangeEmail(OldEmail string, NewEmail string) (*mongo.UpdateR
 	}
 	return res, nil
 }
+func (c *Customer) ChangeMetadataLogin() error {
+	query := bson.M{"_id": c.Id}
+	update := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "metadata.Last_login", Value: time.Now()},
+		{Key: "device", Value: c.Device},
+	}}}
+	_, err := CustomerCollection.UpdateOne(Ctx, query, update)
+	return err
+}
+func CustomerLoginCheck(email string, password string, device Device) (*TokenResponse, *ErrorResponse) {
+	query := bson.M{"email": email}
+	var customer Customer
+	result := CustomerCollection.FindOne(Ctx, query)
+	err := result.Decode(&customer)
+	if err != nil {
+		res := &ErrorResponse{
+			Status:  401,
+			Type:    "string",
+			Message: fmt.Errorf("You have entered an invalid email"),
+		}
+		return nil, res
+	}
+	err = utils.VerifyPassword(password, customer.Password)
+	if err != nil {
+		res := &ErrorResponse{
+			Status:  401,
+			Type:    "string",
+			Message: fmt.Errorf("You have entered an invalid password"),
+		}
+		return nil, res
+	}
+	idToken, err := utils.GenerateRefreshToken(customer.Email, customer.Id, customer.Metadata.TokenVersion)
+	if err != nil {
+		res := &ErrorResponse{
+			Status:  500,
+			Message: err,
+		}
+		return nil, res
+	}
+	token, err := utils.GenerateAccessToken(customer.Email, customer.Id, Roles[0])
+	if err != nil {
+		res := &ErrorResponse{
+			Status:  500,
+			Message: err,
+		}
+		return nil, res
+	}
+	t := &TokenResponse{
+		RefreshToken: idToken,
+		AccessToken:  token,
+	}
+	customer.Device = device
+	err = customer.ChangeMetadataLogin()
+	if err != nil {
+		res := &ErrorResponse{
+			Status:  500,
+			Message: err,
+		}
+		return nil, res
+	}
+	return t, nil
+}

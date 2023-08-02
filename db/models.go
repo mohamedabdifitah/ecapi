@@ -15,19 +15,19 @@ type Attributes struct {
 }
 
 type Menu struct {
-	Id                  primitive.ObjectID ` bson:"_id,omitempty" json:"id,omitempty"`       // 63f642ac061b6f5f089b3a65
-	Title               string             `json:"title" bson:"title" binding:"max=4,min=1"` // Burger
-	Description         string             `json:"description" bson:"description"`           // Chicken fries contains
-	Status              string             `json:"status" bson:"status"`                     // available , unavailable , banned
-	Category            string             `json:"category" bson:"category"`                 // fast food , drink ,
-	Images              []string           `json:"image" bson:"image"`                       // Images of the product urls
-	Price               uint               `json:"price" bson:"price"`                       // the price of the product is represented as cents 99 = $0.99
-	Attributes          Attributes         `json:"attributes" bson:"attributes"`
-	Metadata            Metadata           `json:"metadata" bson:"metadata"`
-	Discount            uint               `json:"-" bson:"discount"` // 10%
-	ResturantExternalId string             `json:"resturant_external_id" bson:"resturant_external_id"`
-	Reciepe             []string           `json:"reciepe" bson:"reciepe"`
-	Barcode             string             `json:"-" bson:"barcode"` // if this needed
+	Id                 primitive.ObjectID ` bson:"_id,omitempty" json:"id,omitempty"`       // 63f642ac061b6f5f089b3a65
+	Title              string             `json:"title" bson:"title" binding:"max=4,min=1"` // Burger
+	Description        string             `json:"description" bson:"description"`           // Chicken fries contains
+	Status             string             `json:"status" bson:"status"`                     // available , unavailable , banned
+	Category           string             `json:"category" bson:"category"`                 // fast food , drink ,
+	Images             []string           `json:"image" bson:"image"`                       // Images of the product urls
+	Price              uint               `json:"price" bson:"price"`                       // the price of the product is represented as cents 99 = $0.99
+	Attributes         Attributes         `json:"attributes" bson:"attributes"`
+	Metadata           Metadata           `json:"metadata" bson:"metadata"`
+	Discount           uint               `json:"-" bson:"discount"` // 10%
+	MerchantExternalId string             `json:"merchant_external_id" bson:"merchant_external_id"`
+	Reciepe            []string           `json:"reciepe" bson:"reciepe"`
+	Barcode            string             `json:"-" bson:"barcode"` // if this needed
 }
 type Metadata struct {
 	CreatedAt time.Time `json:"created_at" bson:"created_at"`
@@ -62,9 +62,10 @@ type Customer struct {
 	Metadata   AccountMetadata    `bson:"metadata" json:"metadata"`
 	Profile    string             `bson:"profile" json:"profile"`
 	Password   string             `bson:"password" json:"-"`
+	Device     Device             `bson:"device" json:"-"`
 }
 type AccountMetadata struct {
-	TokenVersion string    `bson:"token_version" json:"-"`
+	TokenVersion int       `bson:"token_version" json:"-"`
 	CreatedAt    time.Time `json:"created_at" bson:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at" bson:"updated_at"`
 	LasLogin     time.Time `bson:"Last_login" json:"last_login"`
@@ -85,7 +86,7 @@ type Driver struct {
 	Age       primitive.DateTime `json:"age" bson:"age"`
 	Address   string             `json:"address" bson:"address"`
 }
-type Resturant struct {
+type Merchant struct {
 	Id                primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65
 	BusinessName      string             `bson:"business_name" json:"business_name"`
 	Location          []float64          `bson:"location" json:"location"`
@@ -114,4 +115,8 @@ type Coupon struct {
 type Otp struct {
 	Code  string `bson:"code" json:"code"`
 	Phone string `bson:"phone" json:"phone"`
+}
+type Device struct {
+	DeviceId string `bson:"device_id" json:"device_id"`
+	Kind     string `bson:"kind" json:"kind"` // andriod ,ios
 }
