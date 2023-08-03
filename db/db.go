@@ -60,7 +60,7 @@ func ConnectDB() {
 	CreateIndex("phone", DriverCollection)
 	CreateIndex("given_name", DriverCollection)
 	CreateIndex("business_name", MerchantCollection)
-	CreateIndex("phone_number", MerchantCollection)
+	CreateIndex("business_phone", MerchantCollection)
 	CreateIndex("barcode", MenuCollection)
 }
 func CloseDB() error {

@@ -8,6 +8,7 @@ import (
 func RouterDefinition() {
 
 	CustomerRouteDefinition()
+	MerchantRouteDefinition()
 }
 func CustomerRouteDefinition() {
 	CustomerRouter.GET("/all", middleware.AuthorizeRolesMiddleware([]string{"admin", "manager"}), controller.GetAllCustomers)
@@ -18,4 +19,14 @@ func CustomerRouteDefinition() {
 	CustomerRouter.DELETE("/delete/:id", controller.DeleteCustomer)
 	CustomerRouter.POST("/singup/email", controller.SingUpCustomerWithEmail)
 	CustomerRouter.POST("/signin/email", controller.CustomerEmailLogin)
+}
+func MerchantRouteDefinition() {
+	MerchantRouter.GET("/all", controller.GetAllMerchants)
+	MerchantRouter.GET("/get/:id", controller.GetMerchant)
+	MerchantRouter.PUT("/update/:id", controller.UpdateMerchant)
+	MerchantRouter.PATCH("/change/password/:id", controller.ChangeMerchantPassword)
+	MerchantRouter.PATCH("/change/phone/:id", controller.ChangeMerchantPhone)
+	MerchantRouter.DELETE("/delete/:id", controller.DeleteMerchant)
+	MerchantRouter.POST("/singup/phone", controller.SingUpMerchantWithPhone)
+	MerchantRouter.POST("/signin/phone", controller.MerchantPhoneLogin)
 }

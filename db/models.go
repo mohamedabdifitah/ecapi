@@ -90,13 +90,15 @@ type Driver struct {
 type Merchant struct {
 	Id                primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65
 	BusinessName      string             `bson:"business_name" json:"business_name"`
+	BusinessEmail     string             `json:"business_email" bson:"business_email"`
+	BusinessPhone     string             `bson:"business_phone" json:"business_phone"`
 	Location          []float64          `bson:"location" json:"location"`
 	Address           string             `bson:"address" json:"address"`
-	TimeOperatorStart string             `bson:"operation_time_start" json:"operation_time_start"` // 0710 => 07:19 UTC
-	TimeOperatorEnd   string             `bson:"operation_time_end" json:"operation_time_end"`     // 2320 => 23:30 UTC
-	PhoneNumber       string             `bson:"phone_number" json:"phone_number"`
-	Metadata          Metadata           `bson:"metadata" json:"metadata"`
+	TimeOperatorStart int                `bson:"time_operation_start" json:"time_operation_start"` // 0710 => 07:19 UTC
+	TimeOperatorEnd   int                `bson:"time_operation_end" json:"time_operation_end"`     // 2320 => 23:30 UTC
+	Metadata          AccountMetadata    `bson:"metadata" json:"metadata"`
 	Password          string             `json:"-" bson:"password"`
+	Device            Device             `json:"-" bson:"device"`
 }
 type Review struct {
 	Id         string   `bson:"_id,omitempty" json:"id,omitempty"`
@@ -110,8 +112,8 @@ type Review struct {
 type Coupon struct {
 	Token             string             `json:"token" bson:"token"`
 	Rate              uint               `json:"rate" bson:"rate"`                                 // percentage of the discount
-	TimeOperatorStart primitive.DateTime `bson:"operation_time_start" json:"operation_time_start"` // Datetime Started
-	TimeOperatorEnd   primitive.DateTime `bson:"operation_time_end" json:"operation_time_end"`     // Datetime End coupon expires
+	TimeOperatorStart primitive.DateTime `bson:"time_operation_start" json:"time_operation_start"` // Datetime Started
+	TimeOperatorEnd   primitive.DateTime `bson:"time_operation_end" json:"time_operation_end"`     // Datetime End coupon expires
 }
 type Otp struct {
 	Code  string `bson:"code" json:"code"`

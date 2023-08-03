@@ -8,16 +8,16 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func GetAllCustomers(c *gin.Context) {
-	var customer *db.Customer
-	customers, err := customer.GetAll()
+func GetAllMerchants(c *gin.Context) {
+	var merchant *db.Merchant
+	merchants, err := merchant.GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, customers)
+	c.JSON(http.StatusOK, merchants)
 }
-func GetCustomer(c *gin.Context) {
+func GetMerchant(c *gin.Context) {
 	var id string
 	id = c.Param("id")
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -25,43 +25,43 @@ func GetCustomer(c *gin.Context) {
 		c.String(400, "Invalid Id")
 		return
 	}
-	customer := db.Customer{
+	merchant := db.Merchant{
 		Id: objectId,
 	}
-	err = customer.GetById()
+	err = merchant.GetById()
 	if err != nil {
 		c.String(200, err.Error())
 		return
 	}
-	c.JSON(200, customer)
+	c.JSON(200, merchant)
 }
-func SingUpCustomerWithEmail(c *gin.Context) {
-	var body *SingUpCustomerWithEmailBody
+func SingUpMerchantWithPhone(c *gin.Context) {
+	var body *SingUpMerchantWithPhoneBody
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
 		c.JSON(400, err)
 		return
 	}
-	customer := db.Customer{
-		Email:    body.Email,
-		Password: body.Password,
+	merchant := db.Merchant{
+		BusinessPhone: body.BusinessPhone,
+		Password:      body.Password,
 		Metadata: db.AccountMetadata{
-			Provider: "email",
+			Provider: "phone",
 		},
 	}
-	res, err := customer.Save()
+	res, err := merchant.Save()
 	if err != nil {
 		c.JSON(500, err.Error())
 		return
 	}
 	c.JSON(201, res)
 }
-func UpdateCustomer(c *gin.Context) {
-	var body *CustomerBody
+func UpdateMerchant(c *gin.Context) {
+	var body *MerchantBody
 	var id string = c.Param("id")
 	objecId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		c.String(400, "Invalid customer id")
+		c.String(400, "Invalid merchant id")
 		return
 	}
 	err = c.ShouldBindJSON(&body)
@@ -69,14 +69,16 @@ func UpdateCustomer(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
-	customer := db.Customer{
-		Id:         objecId,
-		Address:    body.Address,
-		GivenName:  body.GivenName,
-		FamilyName: body.FamilyName,
-		Phone:      body.Phone,
+	merchant := db.Merchant{
+		Id:                objecId,
+		Location:          body.Location,
+		Address:           body.Address,
+		BusinessName:      body.BusinessName,
+		BusinessEmail:     body.BusinessEmail,
+		TimeOperatorStart: body.TimeOperationStart,
+		TimeOperatorEnd:   body.TimeOperationEnd,
 	}
-	res, err := customer.Update()
+	res, err := merchant.Update()
 	if err != nil {
 		c.JSON(500, err)
 		return
@@ -84,17 +86,17 @@ func UpdateCustomer(c *gin.Context) {
 	c.JSON(200, res)
 
 }
-func DeleteCustomer(c *gin.Context) {
+func DeleteMerchant(c *gin.Context) {
 	var id string = c.Param("id")
 	objecId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		c.String(400, "Invalid customer id")
+		c.String(400, "Invalid merchant id")
 		return
 	}
-	customer := db.Customer{
+	merchant := db.Merchant{
 		Id: objecId,
 	}
-	res, err := customer.Delete()
+	res, err := merchant.Delete()
 	if err != nil {
 		c.String(500, err.Error())
 		return
@@ -102,7 +104,7 @@ func DeleteCustomer(c *gin.Context) {
 	c.JSON(200, res)
 
 }
-func ChangeCustomerPassword(c *gin.Context) {
+func ChangeMerchantPassword(c *gin.Context) {
 	var id string = c.Param("id")
 	var body *ChangePasswordBody
 	objecId, err := primitive.ObjectIDFromHex(id)
@@ -115,19 +117,19 @@ func ChangeCustomerPassword(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
-	customer := db.Customer{
+	merchant := db.Merchant{
 		Id: objecId,
 	}
-	res := customer.ChangePassword(body.OldPassword, body.NewPassword)
+	res := merchant.ChangePassword(body.OldPassword, body.NewPassword)
 	if res != nil {
 		res.Error(c)
 		return
 	}
 	c.String(200, "successfully changed password")
 }
-func ChangeCustomerEmail(c *gin.Context) {
+func ChangeMerchantPhone(c *gin.Context) {
 	var id string = c.Param("id")
-	var body *ChangeEmaildBody
+	var body *ChangePhonedBody
 	objecId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.String(400, "invalid id")
@@ -138,26 +140,27 @@ func ChangeCustomerEmail(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
-	customer := db.Customer{
+	merchant := db.Merchant{
 		Id: objecId,
 	}
-	res, ErrorResponse := customer.ChangeEmail(body.OldEmail, body.NewEmail)
-	if ErrorResponse != nil {
-		ErrorResponse.Error(c)
+	res, err := merchant.ChangeBusinessPhone(body.OldPhone, body.NewPhone)
+	if err != nil {
+		c.String(500, err.Error())
+		return
 	}
 	if res.MatchedCount > 0 && res.ModifiedCount == 0 {
 
-		c.String(400, "email is same as original")
+		c.String(400, "phone is same as original")
 		return
 	}
 	if res.MatchedCount == 0 && res.ModifiedCount == 0 {
-		c.String(200, "email not found")
+		c.String(200, "phone not found")
 		return
 	}
-	c.String(200, "email updated successfully")
+	c.String(200, "phone updated successfully")
 }
-func CustomerEmailLogin(c *gin.Context) {
-	var body *EmailLoginBody
+func MerchantPhoneLogin(c *gin.Context) {
+	var body *PhoneLoginBody
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
 		c.JSON(400, err)
@@ -167,7 +170,7 @@ func CustomerEmailLogin(c *gin.Context) {
 		DeviceId: c.GetHeader("device_id"),
 		Kind:     c.GetHeader("device_kind"),
 	}
-	tokens, ErrorResponse := db.CustomerLoginCheck(body.Email, body.Password, device)
+	tokens, ErrorResponse := db.MerchantLoginCheck(body.BusinessPhone, body.Password, device)
 	if ErrorResponse != nil {
 		ErrorResponse.Error(c)
 		return
