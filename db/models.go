@@ -63,6 +63,7 @@ type Customer struct {
 	Profile    string             `bson:"profile" json:"profile"`
 	Password   string             `bson:"password" json:"-"`
 	Device     Device             `bson:"device" json:"-"`
+	Phone      string             `bson:"phone" json:"phone"`
 }
 type AccountMetadata struct {
 	TokenVersion int       `bson:"token_version" json:"-"`

@@ -75,7 +75,7 @@ func (c *Customer) Update() (*mongo.UpdateResult, error) {
 		{Key: "family_name", Value: c.FamilyName},
 		{Key: "given_name", Value: c.GivenName},
 		{Key: "address", Value: c.Address},
-		{Key: "profile", Value: c.Profile},
+		{Key: "phone", Value: c.Phone},
 		{Key: "metadata.updated_at", Value: time.Now().UTC()},
 	}}}
 

@@ -71,10 +71,10 @@ func UpdateCustomer(c *gin.Context) {
 	}
 	customer := db.Customer{
 		Id:         objecId,
-		Profile:    body.Profile,
 		Address:    body.Address,
 		GivenName:  body.GivenName,
 		FamilyName: body.FamilyName,
+		Phone:      body.Phone,
 	}
 	res, err := customer.Update()
 	if err != nil {

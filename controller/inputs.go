@@ -8,7 +8,7 @@ type CustomerBody struct {
 	GivenName  string `json:"given_name"`
 	FamilyName string `json:"family_name"`
 	Address    string `json:"address"`
-	Profile    string `json:"profile"`
+	Phone      string `json:"phone"`
 }
 type ChangePasswordBody struct {
 	NewPassword string `json:"new_password"`
