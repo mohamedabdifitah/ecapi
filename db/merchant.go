@@ -105,11 +105,11 @@ func (m *Merchant) ChangePassword(OldPassword string, NewPassword string) *Error
 	result := MerchantCollection.FindOne(Ctx, query)
 	err := result.Decode(&m)
 	if err != nil {
-
-		return &ErrorResponse{Status: 500, Message: err}
-
+		if err.Error() == "mongo: no documents in result" {
+			return &ErrorResponse{Status: 403, Message: fmt.Errorf("user not found"), Type: "string"}
+		}
+		return &ErrorResponse{Status: 500, Message: err, Type: "string"}
 	}
-
 	err = utils.VerifyPassword(OldPassword, m.Password)
 	if err != nil {
 		return &ErrorResponse{Status: 401, Message: fmt.Errorf("password is invalid"), Type: "string"}

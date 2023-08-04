@@ -9,6 +9,7 @@ func RouterDefinition() {
 
 	CustomerRouteDefinition()
 	MerchantRouteDefinition()
+	DriverRouteDefinition()
 }
 func CustomerRouteDefinition() {
 	CustomerRouter.GET("/all", middleware.AuthorizeRolesMiddleware([]string{"admin", "manager"}), controller.GetAllCustomers)
@@ -17,7 +18,7 @@ func CustomerRouteDefinition() {
 	CustomerRouter.PATCH("/change/password/:id", controller.ChangeCustomerPassword)
 	CustomerRouter.PATCH("/change/email/:id", controller.ChangeCustomerEmail)
 	CustomerRouter.DELETE("/delete/:id", controller.DeleteCustomer)
-	CustomerRouter.POST("/singup/email", controller.SingUpCustomerWithEmail)
+	CustomerRouter.POST("/signup/email", controller.SignUpCustomerWithEmail)
 	CustomerRouter.POST("/signin/email", controller.CustomerEmailLogin)
 }
 func MerchantRouteDefinition() {
@@ -27,6 +28,17 @@ func MerchantRouteDefinition() {
 	MerchantRouter.PATCH("/change/password/:id", controller.ChangeMerchantPassword)
 	MerchantRouter.PATCH("/change/phone/:id", controller.ChangeMerchantPhone)
 	MerchantRouter.DELETE("/delete/:id", controller.DeleteMerchant)
-	MerchantRouter.POST("/singup/phone", controller.SingUpMerchantWithPhone)
+	MerchantRouter.POST("/signup/phone", controller.SignUpMerchantWithPhone)
 	MerchantRouter.POST("/signin/phone", controller.MerchantPhoneLogin)
+}
+func DriverRouteDefinition() {
+	DriverRouter.GET("/all", controller.GetAllDrivers)
+	DriverRouter.GET("/get/:id", controller.GetDriver)
+	DriverRouter.PUT("/update/:id", controller.UpdateDriver)
+	DriverRouter.PATCH("/change/password/:id", controller.ChangeDriverPassword)
+	DriverRouter.PATCH("/change/phone/:id", controller.ChangeDriverPhone)
+	DriverRouter.PATCH("/change/email/:id", controller.ChangeDriverEmail)
+	DriverRouter.DELETE("/delete/:id", controller.DeleteDriver)
+	DriverRouter.POST("/signup", controller.SignUpDriverWithPhone)
+	DriverRouter.POST("/signin/phone", controller.DriverPhoneLogin)
 }

@@ -38,7 +38,7 @@ type Item struct {
 	Quantity       uint   `json:"quantity" bson:"quantity"`
 }
 type Order struct {
-	Id                    uint      ` bson:"_id,omitempty" json:"id,omitempty"`
+	Id                    uint      `bson:"_id,omitempty" json:"id,omitempty"`
 	OrderValue            uint      `json:"order_value" bson:"order_value" ` // Order value is represented as cents 199 = $19.9
 	Items                 []Item    `json:"items" bson:"items"`
 	DropOffExternalId     string    `bson:"dropoff_external_id" json:"dropoff_external_id"`
@@ -77,15 +77,16 @@ type Setting struct {
 	ReceiveUpdates      bool `bson:"receive_update" json:"receive_update"`
 }
 type Driver struct {
-	Id        string             ` bson:"_id,omitempty" json:"id,omitempty"`
-	Role      string             ` bson:"role" json:"role"` // Driver ,...
-	Password  string             `json:"-" bson:"password"`
-	Email     string             `json:"email" bson:"email"`
-	Phone     string             `json:"phone" bson:"phone"`
-	GivenName string             `json:"given_name" bson:"given_name"`
-	Vehicle   string             `json:"vehicle" bson:"vehicle"`
-	Age       primitive.DateTime `json:"age" bson:"age"`
-	Address   string             `json:"address" bson:"address"`
+	Id          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Password    string             `json:"-" bson:"password"`
+	Email       string             `json:"email" bson:"email"`
+	Phone       string             `json:"phone" bson:"phone"`
+	GivenName   string             `json:"given_name" bson:"given_name"`
+	VehicleType string             `json:"vehicle_type" bson:"vehicle_type"`
+	Age         primitive.DateTime `json:"age" bson:"age"`
+	Address     string             `json:"address" bson:"address"`
+	Metadata    AccountMetadata    `json:"metadata" bson:"metadata"`
+	Device      Device             `json:"deivice" bson:"deivice"`
 }
 type Merchant struct {
 	Id                primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65

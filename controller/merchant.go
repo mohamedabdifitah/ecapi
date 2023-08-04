@@ -35,8 +35,8 @@ func GetMerchant(c *gin.Context) {
 	}
 	c.JSON(200, merchant)
 }
-func SingUpMerchantWithPhone(c *gin.Context) {
-	var body *SingUpMerchantWithPhoneBody
+func SignUpMerchantWithPhone(c *gin.Context) {
+	var body *SignUpMerchantWithPhoneBody
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
 		c.JSON(400, err)
@@ -117,6 +117,10 @@ func ChangeMerchantPassword(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
+	if body.OldPassword == body.NewPassword {
+		c.String(400, "password is same as original")
+		return
+	}
 	merchant := db.Merchant{
 		Id: objecId,
 	}
@@ -170,7 +174,7 @@ func MerchantPhoneLogin(c *gin.Context) {
 		DeviceId: c.GetHeader("device_id"),
 		Kind:     c.GetHeader("device_kind"),
 	}
-	tokens, ErrorResponse := db.MerchantLoginCheck(body.BusinessPhone, body.Password, device)
+	tokens, ErrorResponse := db.MerchantLoginCheck(body.Phone, body.Password, device)
 	if ErrorResponse != nil {
 		ErrorResponse.Error(c)
 		return

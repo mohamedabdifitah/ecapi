@@ -8,16 +8,16 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func GetAllCustomers(c *gin.Context) {
-	var customer *db.Customer
-	customers, err := customer.GetAll()
+func GetAllDrivers(c *gin.Context) {
+	var driver *db.Driver
+	drivers, err := driver.GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, customers)
+	c.JSON(http.StatusOK, drivers)
 }
-func GetCustomer(c *gin.Context) {
+func GetDriver(c *gin.Context) {
 	var id string
 	id = c.Param("id")
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -25,43 +25,44 @@ func GetCustomer(c *gin.Context) {
 		c.String(400, "Invalid Id")
 		return
 	}
-	customer := db.Customer{
+	driver := db.Driver{
 		Id: objectId,
 	}
-	err = customer.GetById()
+	err = driver.GetById()
 	if err != nil {
 		c.String(200, err.Error())
 		return
 	}
-	c.JSON(200, customer)
+	c.JSON(200, driver)
 }
-func SignUpCustomerWithEmail(c *gin.Context) {
-	var body *SignUpWithEmailBody
+func SignUpDriverWithPhone(c *gin.Context) {
+	var body *SignUpWithDriverBody
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
 		c.JSON(400, err)
 		return
 	}
-	customer := db.Customer{
-		Email:    body.Email,
+	driver := db.Driver{
+		Phone:    body.Phone,
+		Email:    body.Emai,
 		Password: body.Password,
 		Metadata: db.AccountMetadata{
-			Provider: "email",
+			Provider: "phone",
 		},
 	}
-	res, err := customer.Save()
+	res, err := driver.Save()
 	if err != nil {
 		c.JSON(500, err.Error())
 		return
 	}
 	c.JSON(201, res)
 }
-func UpdateCustomer(c *gin.Context) {
-	var body *CustomerBody
+func UpdateDriver(c *gin.Context) {
+	var body *DriverBody
 	var id string = c.Param("id")
 	objecId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		c.String(400, "Invalid customer id")
+		c.String(400, "Invalid driver id")
 		return
 	}
 	err = c.ShouldBindJSON(&body)
@@ -69,14 +70,14 @@ func UpdateCustomer(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
-	customer := db.Customer{
-		Id:         objecId,
-		Address:    body.Address,
-		GivenName:  body.GivenName,
-		FamilyName: body.FamilyName,
-		Phone:      body.Phone,
+	driver := db.Driver{
+		Id:          objecId,
+		Address:     body.Address,
+		GivenName:   body.GivenName,
+		VehicleType: body.VehicleType,
+		// Age:         body.Age,
 	}
-	res, err := customer.Update()
+	res, err := driver.Update()
 	if err != nil {
 		c.JSON(500, err)
 		return
@@ -84,17 +85,17 @@ func UpdateCustomer(c *gin.Context) {
 	c.JSON(200, res)
 
 }
-func DeleteCustomer(c *gin.Context) {
+func DeleteDriver(c *gin.Context) {
 	var id string = c.Param("id")
 	objecId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		c.String(400, "Invalid customer id")
+		c.String(400, "Invalid driver id")
 		return
 	}
-	customer := db.Customer{
+	driver := db.Driver{
 		Id: objecId,
 	}
-	res, err := customer.Delete()
+	res, err := driver.Delete()
 	if err != nil {
 		c.String(500, err.Error())
 		return
@@ -102,7 +103,7 @@ func DeleteCustomer(c *gin.Context) {
 	c.JSON(200, res)
 
 }
-func ChangeCustomerPassword(c *gin.Context) {
+func ChangeDriverPassword(c *gin.Context) {
 	var id string = c.Param("id")
 	var body *ChangePasswordBody
 	objecId, err := primitive.ObjectIDFromHex(id)
@@ -119,17 +120,17 @@ func ChangeCustomerPassword(c *gin.Context) {
 		c.String(400, "password is same as original")
 		return
 	}
-	customer := db.Customer{
+	driver := db.Driver{
 		Id: objecId,
 	}
-	res := customer.ChangePassword(body.OldPassword, body.NewPassword)
+	res := driver.ChangePassword(body.OldPassword, body.NewPassword)
 	if res != nil {
 		res.Error(c)
 		return
 	}
 	c.String(200, "successfully changed password")
 }
-func ChangeCustomerEmail(c *gin.Context) {
+func ChangeDriverEmail(c *gin.Context) {
 	var id string = c.Param("id")
 	var body *ChangeEmaildBody
 	objecId, err := primitive.ObjectIDFromHex(id)
@@ -142,10 +143,10 @@ func ChangeCustomerEmail(c *gin.Context) {
 		c.JSON(400, err)
 		return
 	}
-	customer := db.Customer{
+	driver := db.Driver{
 		Id: objecId,
 	}
-	res, ErrorResponse := customer.ChangeEmail(body.OldEmail, body.NewEmail)
+	res, ErrorResponse := driver.ChangeEmail(body.OldEmail, body.NewEmail)
 	if ErrorResponse != nil {
 		ErrorResponse.Error(c)
 	}
@@ -160,8 +161,8 @@ func ChangeCustomerEmail(c *gin.Context) {
 	}
 	c.String(200, "email updated successfully")
 }
-func CustomerEmailLogin(c *gin.Context) {
-	var body *EmailLoginBody
+func DriverPhoneLogin(c *gin.Context) {
+	var body *PhoneLoginBody
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
 		c.JSON(400, err)
@@ -171,10 +172,41 @@ func CustomerEmailLogin(c *gin.Context) {
 		DeviceId: c.GetHeader("device_id"),
 		Kind:     c.GetHeader("device_kind"),
 	}
-	tokens, ErrorResponse := db.CustomerLoginCheck(body.Email, body.Password, device)
+	tokens, ErrorResponse := db.DriverLoginCheck(body.Phone, body.Password, device)
 	if ErrorResponse != nil {
 		ErrorResponse.Error(c)
 		return
 	}
 	c.JSON(200, tokens)
+}
+func ChangeDriverPhone(c *gin.Context) {
+	var id string = c.Param("id")
+	var body *ChangePhonedBody
+	objecId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.String(400, "invalid id")
+		return
+	}
+	err = c.ShouldBindJSON(&body)
+	if err != nil {
+		c.JSON(400, err)
+		return
+	}
+	driver := db.Driver{
+		Id: objecId,
+	}
+	res, err := driver.ChangePhone(body.OldPhone, body.NewPhone)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	if res.MatchedCount > 0 && res.ModifiedCount == 0 {
+		c.String(400, "phone is same as original")
+		return
+	}
+	if res.MatchedCount == 0 && res.ModifiedCount == 0 {
+		c.String(200, "phone not found")
+		return
+	}
+	c.String(200, "phone updated successfully")
 }

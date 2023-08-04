@@ -1,6 +1,6 @@
 package controller
 
-type SingUpCustomerWithEmailBody struct {
+type SignUpWithEmailBody struct {
 	Email    string `json:"email" `
 	Password string `json:"password"`
 }
@@ -25,7 +25,7 @@ type EmailLoginBody struct {
 	DeviceId string `json:"device_id"`
 	Kind     string `json:"kind"`
 }
-type SingUpMerchantWithPhoneBody struct {
+type SignUpMerchantWithPhoneBody struct {
 	BusinessPhone string `json:"business_phone"`
 	Password      string `json:"password"`
 }
@@ -42,6 +42,17 @@ type ChangePhonedBody struct {
 	OldPhone string `json:"old_phone"`
 }
 type PhoneLoginBody struct {
-	BusinessPhone string `json:"business_phone"`
-	Password      string `json:"password"`
+	Phone    string `json:"phone"`
+	Password string `json:"password"`
+}
+type DriverBody struct {
+	Age         string `json:"age"`
+	GivenName   string `json:"given_name"`
+	Address     string `json:"address"`
+	VehicleType string `json:"vehicle_type"`
+}
+type SignUpWithDriverBody struct {
+	Phone    string `json:"phone"`
+	Emai     string `json:"email"`
+	Password string `json:"password"`
 }

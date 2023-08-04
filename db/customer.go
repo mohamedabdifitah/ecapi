@@ -90,8 +90,10 @@ func (c *Customer) ChangePassword(OldPassword string, NewPassword string) *Error
 	result := CustomerCollection.FindOne(Ctx, query)
 	err := result.Decode(&c)
 	if err != nil {
-
-		return &ErrorResponse{Status: 500, Message: err}
+		if err.Error() == "mongo: no documents in result" {
+			return &ErrorResponse{Status: 403, Message: fmt.Errorf("user not found"), Type: "string"}
+		}
+		return &ErrorResponse{Status: 500, Message: err, Type: "string"}
 
 	}
 
@@ -110,6 +112,7 @@ func (c *Customer) ChangePassword(OldPassword string, NewPassword string) *Error
 	if err != nil {
 		return &ErrorResponse{Status: 500, Message: err}
 	}
+
 	return nil
 }
 func (c *Customer) ChangeEmail(OldEmail string, NewEmail string) (*mongo.UpdateResult, *ErrorResponse) {
