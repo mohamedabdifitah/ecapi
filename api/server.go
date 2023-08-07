@@ -14,7 +14,8 @@ var (
 	MerchantRouter *gin.RouterGroup
 	DriverRouter   *gin.RouterGroup
 	ReviewRouter   *gin.RouterGroup
-	Router   *gin.RouterGroup
+	MenuRouter     *gin.RouterGroup
+	Router         *gin.RouterGroup
 )
 
 func Initserver() {
@@ -35,5 +36,6 @@ func InitRoutes(server *gin.Engine) {
 	DriverRouter = path.Group("/driver")
 	MerchantRouter = path.Group("/merchant")
 	OrderRouter = path.Group("/order")
+	MenuRouter = path.Group("/menu")
 	RouterDefinition()
 }

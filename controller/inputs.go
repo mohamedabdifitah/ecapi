@@ -1,5 +1,7 @@
 package controller
 
+import "github.com/mohamedabdifitah/ecapi/db"
+
 type SignUpWithEmailBody struct {
 	Email    string `json:"email" `
 	Password string `json:"password"`
@@ -55,4 +57,28 @@ type SignUpWithDriverBody struct {
 	Phone    string `json:"phone"`
 	Emai     string `json:"email"`
 	Password string `json:"password"`
+}
+type MenuBody struct {
+	Title              string        `json:"title" bson:"title"`             // Burger
+	Description        string        `json:"description" bson:"description"` // Chicken fries contains
+	Status             string        `json:"status" bson:"status"`           // available , unavailable , banned
+	Category           string        `json:"category" bson:"category"`       // fast food , drink ,                     // Images of the product urls
+	Price              uint          `json:"price" bson:"price"`             // the price of the product is represented as cents 99 = $0.99
+	Attributes         db.Attributes `json:"attributes" bson:"attributes"`
+	Discount           uint          `json:"discount" bson:"discount"` // 10%
+	MerchantExternalId string        `json:"merchant_external_id" bson:"merchant_external_id"`
+	Reciepe            []string      `json:"reciepe" bson:"reciepe"`
+}
+type CreateMenuBody struct {
+	Title              string        `json:"title" bson:"title" binding:"max=30,min=1"` // Burger
+	Description        string        `json:"description" bson:"description"`            // Chicken fries contains
+	Status             string        `json:"status" bson:"status"`                      // available , unavailable , banned
+	Category           string        `json:"category" bson:"category"`                  // fast food , drink ,
+	Images             []string      `json:"image" bson:"image"`                        // Images of the product urls
+	Price              uint          `json:"price" bson:"price"`                        // the price of the product is represented as cents 99 = $0.99
+	Attributes         db.Attributes `json:"attributes" bson:"attributes"`
+	Discount           uint          `json:"discount" bson:"discount"` // 10%
+	MerchantExternalId string        `json:"merchant_external_id" bson:"merchant_external_id"`
+	Reciepe            []string      `json:"reciepe" bson:"reciepe"`
+	Barcode            string        `json:"-" bson:"barcode"` // if this needed
 }

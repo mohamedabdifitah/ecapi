@@ -6,10 +6,10 @@ import (
 )
 
 func RouterDefinition() {
-
 	CustomerRouteDefinition()
 	MerchantRouteDefinition()
 	DriverRouteDefinition()
+	MenuRouterDefinition()
 }
 func CustomerRouteDefinition() {
 	CustomerRouter.GET("/all", middleware.AuthorizeRolesMiddleware([]string{"admin", "manager"}), controller.GetAllCustomers)
@@ -41,4 +41,10 @@ func DriverRouteDefinition() {
 	DriverRouter.DELETE("/delete/:id", controller.DeleteDriver)
 	DriverRouter.POST("/signup", controller.SignUpDriverWithPhone)
 	DriverRouter.POST("/signin/phone", controller.DriverPhoneLogin)
+}
+func MenuRouterDefinition() {
+	MenuRouter.GET("/get/:id", controller.GetMenu)
+	MenuRouter.GET("/all", controller.GetMenus)
+	MenuRouter.POST("/create", controller.CreateMenu)
+	MenuRouter.PUT("/update/:id", controller.UpdateMenu)
 }

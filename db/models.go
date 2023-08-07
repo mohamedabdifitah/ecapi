@@ -8,23 +8,23 @@ import (
 
 // all this values are represented as cm or centimeter as unit type
 type Attributes struct {
-	Volume primitive.Decimal128 `bson:"volume" json:"volume"`
-	Height primitive.Decimal128 `bson:"height" json:"height"`
-	Width  primitive.Decimal128 `bson:"width" json:"width"`
-	Length primitive.Decimal128 `bson:"length" json:"length"`
+	Volume float64 `bson:"volume" json:"volume"`
+	Height float64 `bson:"height" json:"height"`
+	Width  float64 `bson:"width" json:"width"`
+	Length float64 `bson:"length" json:"length"`
 }
 
 type Menu struct {
-	Id                 primitive.ObjectID ` bson:"_id,omitempty" json:"id,omitempty"`       // 63f642ac061b6f5f089b3a65
-	Title              string             `json:"title" bson:"title" binding:"max=4,min=1"` // Burger
-	Description        string             `json:"description" bson:"description"`           // Chicken fries contains
-	Status             string             `json:"status" bson:"status"`                     // available , unavailable , banned
-	Category           string             `json:"category" bson:"category"`                 // fast food , drink ,
-	Images             []string           `json:"image" bson:"image"`                       // Images of the product urls
-	Price              uint               `json:"price" bson:"price"`                       // the price of the product is represented as cents 99 = $0.99
+	Id                 primitive.ObjectID ` bson:"_id,omitempty" json:"id,omitempty"`        // 63f642ac061b6f5f089b3a65
+	Title              string             `json:"title" bson:"title" binding:"max=30,min=1"` // Burger
+	Description        string             `json:"description" bson:"description"`            // Chicken fries contains
+	Status             string             `json:"status" bson:"status"`                      // available , unavailable , banned
+	Category           string             `json:"category" bson:"category"`                  // fast food , drink ,
+	Images             []string           `json:"image" bson:"image"`                        // Images of the product urls
+	Price              uint               `json:"price" bson:"price"`                        // the price of the product is represented as cents 99 = $0.99
 	Attributes         Attributes         `json:"attributes" bson:"attributes"`
 	Metadata           Metadata           `json:"metadata" bson:"metadata"`
-	Discount           uint               `json:"-" bson:"discount"` // 10%
+	Discount           uint               `json:"discount" bson:"discount"` // 10%
 	MerchantExternalId string             `json:"merchant_external_id" bson:"merchant_external_id"`
 	Reciepe            []string           `json:"reciepe" bson:"reciepe"`
 	Barcode            string             `json:"-" bson:"barcode"` // if this needed
