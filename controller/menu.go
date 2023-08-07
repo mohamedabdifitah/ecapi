@@ -9,21 +9,21 @@ import (
 )
 
 func GetMenus(c *gin.Context) {
-	var body *MenuBody
-	err := c.ShouldBindJSON(&body)
-	if err != nil {
-		c.String(400, err.Error())
-		return
-	}
+	// var body *MenuBody
+	// err := c.ShouldBindJSON(&body)
+	// if err != nil {
+	// 	c.String(400, err.Error())
+	// 	return
+	// }
 	menu := &db.Menu{
-		Title:              body.Title,
-		Description:        body.Description,
-		Category:           body.Category,
-		Reciepe:            body.Reciepe,
-		MerchantExternalId: body.MerchantExternalId,
-		Price:              body.Price,
-		Discount:           body.Discount,
-		Status:             body.Status,
+		// Title:              body.Title,
+		// Description:        body.Description,
+		// Category:           body.Category,
+		// Reciepe:            body.Reciepe,
+		// MerchantExternalId: body.MerchantExternalId,
+		// Price:              body.Price,
+		// Discount:           body.Discount,
+		// Status:             body.Status,
 	}
 	drivers, err := menu.GetAll()
 	if err != nil {

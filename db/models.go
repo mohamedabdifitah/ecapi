@@ -36,21 +36,24 @@ type Metadata struct {
 type Item struct {
 	ItemExternalId string `json:"item_external_id" bson:"item_external_id"`
 	Quantity       uint   `json:"quantity" bson:"quantity"`
+	ItemValue      uint   `json:"item_value" bson:"item_value"`
 }
 type Order struct {
 	Id                    uint      `bson:"_id,omitempty" json:"id,omitempty"`
 	OrderValue            uint      `json:"order_value" bson:"order_value" ` // Order value is represented as cents 199 = $19.9
 	Items                 []Item    `json:"items" bson:"items"`
-	DropOffExternalId     string    `bson:"dropoff_external_id" json:"dropoff_external_id"`
 	DropOffPhone          string    `json:"dropoff_phone" bson:"dropoff_phone"`
 	DropOffAddress        string    `json:"dropoff_address" bson:"dropoff_address"`   // address 901 Market Street 6th Floor San Francisco, CA 94103
 	DroOffLocation        []float64 `json:"dropoff_location" bson:"dropoff_location"` // location cordinates. float([123.1312343,-37.2144343])
 	DropOffInstruction    string    `json:"dropoff_instructions" bson:"dropoff_instructions"`
-	Stage                 string    `json:"stage" bson:"stage"`                                      // prepare,pickup,deleivered.
+	Stage                 string    `json:"stage" bson:"stage"`                                      // pendding,accepted,preparing,ready,pickuped,deleivered.
 	ActionIfUndeliverable string    `json:"action_if_undeliverable" bson:"action_if_undeliverable"`  // return_to_pickup
 	DriverAllowedVehicles []string  `json:"driver_allowed_vehicles" bson:"driver_allowed_vehicles" ` // car , motorcycle , walking
 	PickupAddress         string    `json:"pickup_address" bson:"pickup_address"`
-	PickupReferenceTag    string    `json:"pickup_reference_tag" bson:"pickup_reference_tag"`
+	PickUpExternalId      string    `bson:"pickup_external_id" json:"pickup _external_id"`
+	PickUpPhone           string    `bson:"pickup_phone" json:"pickup_phone"`
+	PickUpLocation        []float64 `bson:"pickup_location" json:"pickup_location"`
+	// PickupReferenceTag    string    `json:"pickup_reference_tag" bson:"pickup_reference_tag"`
 }
 
 type Customer struct {
@@ -102,13 +105,13 @@ type Merchant struct {
 	Device            Device             `json:"-" bson:"device"`
 }
 type Review struct {
-	Id         string   `bson:"_id,omitempty" json:"id,omitempty"`
-	Rate       float32  `bson:"rate" json:"rate"`
-	Message    string   `bson:"message" json:"message"`
-	From       string   `bson:"from" json:"from"`
-	Type       string   `bson:"type" json:"type"` // REVIEW_PRODUCT , REVIEW_DRIVER . REVIEW_MERCHANT
-	ExternalId string   `bson:"external_id" json:"external_id"`
-	Metadata   Metadata `bson:"metadata" json:"metadata"`
+	Id         primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65
+	Rate       uint               `bson:"rate" json:"rate"`
+	Message    string             `bson:"message" json:"message"`
+	From       string             `bson:"from" json:"from"`
+	Type       string             `bson:"type" json:"type"` // REVIEW_MENU , REVIEW_DRIVER . REVIEW_MERCHANT
+	ExternalId string             `bson:"external_id" json:"external_id"`
+	Metadata   Metadata           `bson:"metadata" json:"metadata"`
 }
 type Coupon struct {
 	Token             string             `json:"token" bson:"token"`

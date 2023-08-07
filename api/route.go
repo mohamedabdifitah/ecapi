@@ -10,6 +10,7 @@ func RouterDefinition() {
 	MerchantRouteDefinition()
 	DriverRouteDefinition()
 	MenuRouterDefinition()
+	ReviewRouterDefinition()
 }
 func CustomerRouteDefinition() {
 	CustomerRouter.GET("/all", middleware.AuthorizeRolesMiddleware([]string{"admin", "manager"}), controller.GetAllCustomers)
@@ -48,4 +49,15 @@ func MenuRouterDefinition() {
 	MenuRouter.POST("/create", controller.CreateMenu)
 	MenuRouter.DELETE("/delete/:id", controller.DeleteMenu)
 	MenuRouter.PUT("/update/:id", controller.UpdateMenu)
+}
+
+func ReviewRouterDefinition() {
+	ReviewRouter.GET("/get/:id", controller.GetReviewById)
+	ReviewRouter.GET("/user/:id", controller.GetUserReview)
+	ReviewRouter.GET("/to/:type/:eid", controller.GetReviewToMe)
+	ReviewRouter.GET("/all", controller.GetAllReview)
+	ReviewRouter.PUT("/update/:id", controller.UpdateReview)
+	ReviewRouter.POST("/create", controller.CreateReview)
+	ReviewRouter.DELETE("/delete/:id", controller.DeleteReview)
+
 }

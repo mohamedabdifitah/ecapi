@@ -37,5 +37,6 @@ func InitRoutes(server *gin.Engine) {
 	MerchantRouter = path.Group("/merchant")
 	OrderRouter = path.Group("/order")
 	MenuRouter = path.Group("/menu")
+	ReviewRouter = path.Group("/review")
 	RouterDefinition()
 }

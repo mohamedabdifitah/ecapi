@@ -82,3 +82,10 @@ type CreateMenuBody struct {
 	Reciepe            []string      `json:"reciepe" bson:"reciepe"`
 	Barcode            string        `json:"-" bson:"barcode"` // if this needed
 }
+type ReviewBody struct {
+	Rate       uint   `json:"rate"`
+	Message    string `json:"message"`
+	From       string `json:"from"`
+	Type       string `json:"type"`
+	ExternalId string `json:"external_id"`
+}
