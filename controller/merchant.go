@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
@@ -12,7 +13,7 @@ func GetAllMerchants(c *gin.Context) {
 	var merchant *db.Merchant
 	merchants, err := merchant.GetAll()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, merchants)
@@ -70,8 +71,11 @@ func UpdateMerchant(c *gin.Context) {
 		return
 	}
 	merchant := db.Merchant{
-		Id:                objecId,
-		Location:          body.Location,
+		Id: objecId,
+		Location: db.Location{
+			Type:        "Point",
+			Coordinates: body.Location,
+		},
 		Address:           body.Address,
 		BusinessName:      body.BusinessName,
 		BusinessEmail:     body.BusinessEmail,
@@ -180,4 +184,20 @@ func MerchantPhoneLogin(c *gin.Context) {
 		return
 	}
 	c.JSON(200, tokens)
+}
+func GetMerchantByLocation(c *gin.Context) {
+	longtitude, err := strconv.ParseFloat(c.Query("lang"), 64)
+	latitude, err := strconv.ParseFloat(c.Query("lat"), 64)
+	mindist, err := strconv.ParseInt(c.Query("mindist"), 0, 64)
+	maxdist, err := strconv.ParseInt(c.Query("maxdist"), 0, 64)
+	var merchant db.Merchant
+	location := []float64{
+		longtitude,
+		latitude,
+	}
+	merchants, err := merchant.GetMerchantByLocation(location, maxdist, mindist)
+	if err != nil {
+		c.String(500, err.Error())
+	}
+	c.JSON(200, merchants)
 }

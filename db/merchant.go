@@ -189,3 +189,46 @@ func MerchantLoginCheck(phone string, password string, device Device) (*TokenRes
 	}
 	return t, nil
 }
+func (m *Merchant) GetMerchantByLocation(location []float64, maxdist int64, mindist int64) ([]*Merchant, error) {
+	var merchants []*Merchant
+	filter := bson.D{
+		{Key: "location", Value: bson.D{
+			{
+				Key: "$near", Value: bson.D{
+					{
+						Key: "$maxDistance", Value: maxdist,
+					},
+					{
+						Key: "$minDistance", Value: mindist,
+					},
+					{
+						Key: "$geometry", Value: bson.D{
+							{
+								Key: "type", Value: "Point",
+							},
+							{
+								Key: "coordinates", Value: location,
+							},
+						},
+					},
+				},
+			},
+		}},
+	}
+	cursor, err := MerchantCollection.Find(Ctx, filter, options.Find().SetProjection(ProtectFields("password", "devices", "metadata.token_version", "metadata.provider")))
+	if err != nil {
+		return nil, err
+	}
+	for cursor.Next(Ctx) {
+		var merchant *Merchant
+		err := cursor.Decode(&merchant)
+		if err != nil {
+
+			return nil, err
+
+		}
+		merchants = append(merchants, merchant)
+	}
+	cursor.Close(Ctx)
+	return merchants, nil
+}

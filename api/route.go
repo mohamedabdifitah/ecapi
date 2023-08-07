@@ -25,6 +25,7 @@ func CustomerRouteDefinition() {
 func MerchantRouteDefinition() {
 	MerchantRouter.GET("/all", controller.GetAllMerchants)
 	MerchantRouter.GET("/get/:id", controller.GetMerchant)
+	MerchantRouter.GET("/location", controller.GetMerchantByLocation)
 	MerchantRouter.PUT("/update/:id", controller.UpdateMerchant)
 	MerchantRouter.PATCH("/change/password/:id", controller.ChangeMerchantPassword)
 	MerchantRouter.PATCH("/change/phone/:id", controller.ChangeMerchantPhone)

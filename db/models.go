@@ -27,7 +27,8 @@ type Menu struct {
 	Discount           uint               `json:"discount" bson:"discount"` // 10%
 	MerchantExternalId string             `json:"merchant_external_id" bson:"merchant_external_id"`
 	Reciepe            []string           `json:"reciepe" bson:"reciepe"`
-	Barcode            string             `json:"-" bson:"barcode"` // if this needed
+	Barcode            string             `json:"-" bson:"barcode"`                   // if this needed
+	EstimateTime       int                `json:"estimate_time" bson:"estimate_time"` // in seconds
 }
 type Metadata struct {
 	CreatedAt time.Time `json:"created_at" bson:"created_at"`
@@ -36,24 +37,31 @@ type Metadata struct {
 type Item struct {
 	ItemExternalId string `json:"item_external_id" bson:"item_external_id"`
 	Quantity       uint   `json:"quantity" bson:"quantity"`
-	ItemValue      uint   `json:"item_value" bson:"item_value"`
+	Price          uint   `json:"price" bson:"price"`
 }
 type Order struct {
 	Id                    uint      `bson:"_id,omitempty" json:"id,omitempty"`
 	OrderValue            uint      `json:"order_value" bson:"order_value" ` // Order value is represented as cents 199 = $19.9
 	Items                 []Item    `json:"items" bson:"items"`
 	DropOffPhone          string    `json:"dropoff_phone" bson:"dropoff_phone"`
+	DropOffExteranlId     string    `json:"dropoff_external_id" bson:"dropoff_external_id"`
+	DropOffContactName    string    `json:"dropoff_contact_name" bson:"dropoff_contact_name"`
+	DropOffTimeEstimated  time.Time `json:"dropoff_time_estimated" bson:"dropoff_time_estimated"`
 	DropOffAddress        string    `json:"dropoff_address" bson:"dropoff_address"`   // address 901 Market Street 6th Floor San Francisco, CA 94103
 	DroOffLocation        []float64 `json:"dropoff_location" bson:"dropoff_location"` // location cordinates. float([123.1312343,-37.2144343])
 	DropOffInstruction    string    `json:"dropoff_instructions" bson:"dropoff_instructions"`
-	Stage                 string    `json:"stage" bson:"stage"`                                      // pendding,accepted,preparing,ready,pickuped,deleivered.
-	ActionIfUndeliverable string    `json:"action_if_undeliverable" bson:"action_if_undeliverable"`  // return_to_pickup
-	DriverAllowedVehicles []string  `json:"driver_allowed_vehicles" bson:"driver_allowed_vehicles" ` // car , motorcycle , walking
+	Stage                 string    `json:"stage" bson:"stage"`                                     // pendding,accepted,preparing,ready,pickuped,deleivered.
+	ActionIfUndeliverable string    `json:"action_if_undeliverable" bson:"action_if_undeliverable"` // return_to_pickup
 	PickupAddress         string    `json:"pickup_address" bson:"pickup_address"`
 	PickUpExternalId      string    `bson:"pickup_external_id" json:"pickup _external_id"`
 	PickUpPhone           string    `bson:"pickup_phone" json:"pickup_phone"`
 	PickUpLocation        []float64 `bson:"pickup_location" json:"pickup_location"`
-	// PickupReferenceTag    string    `json:"pickup_reference_tag" bson:"pickup_reference_tag"`
+	PickupTime            time.Time `bson:"pickup_time" json:"pickup_time"`
+	PickupTimeEstimated   time.Time `bson:"pickup_time_estimated" json:"pickup_time_estimated"`
+	PickupReferenceTag    string    `json:"pickup_reference_tag" bson:"pickup_reference_tag"`
+	DriverPhone           string    `bson:"driver_phone" json:"driver_phone"`
+	DriverAllowedVehicles []string  `json:"driver_allowed_vehicles" bson:"driver_allowed_vehicles" ` // car , motorcycle , walking
+	DriverExternalId      string    `bson:"driver_external_id" json:"driver_external_id" bson:"driver_external_id"`
 }
 
 type Customer struct {
@@ -96,7 +104,7 @@ type Merchant struct {
 	BusinessName      string             `bson:"business_name" json:"business_name"`
 	BusinessEmail     string             `json:"business_email" bson:"business_email"`
 	BusinessPhone     string             `bson:"business_phone" json:"business_phone"`
-	Location          []float64          `bson:"location" json:"location"`
+	Location          Location           `bson:"location" json:"location"`
 	Address           string             `bson:"address" json:"address"`
 	TimeOperatorStart int                `bson:"time_operation_start" json:"time_operation_start"` // 0710 => 07:19 UTC
 	TimeOperatorEnd   int                `bson:"time_operation_end" json:"time_operation_end"`     // 2320 => 23:30 UTC
@@ -126,4 +134,8 @@ type Otp struct {
 type Device struct {
 	DeviceId string `bson:"device_id" json:"device_id"`
 	Kind     string `bson:"kind" json:"kind"` // andriod ,ios
+}
+type Location struct {
+	Type        string    `bson:"type" json:"type"`
+	Coordinates []float64 `bson:"coordinates" json:"coordinates"`
 }
