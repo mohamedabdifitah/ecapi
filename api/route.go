@@ -46,5 +46,6 @@ func MenuRouterDefinition() {
 	MenuRouter.GET("/get/:id", controller.GetMenu)
 	MenuRouter.GET("/all", controller.GetMenus)
 	MenuRouter.POST("/create", controller.CreateMenu)
+	MenuRouter.DELETE("/delete/:id", controller.DeleteMenu)
 	MenuRouter.PUT("/update/:id", controller.UpdateMenu)
 }

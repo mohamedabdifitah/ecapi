@@ -17,9 +17,7 @@ func (m *Menu) GetById() error {
 // func (m *Menu) GetMerchantMenu() ([]*Menu , error) {
 // }
 func (m *Menu) Create() (*mongo.InsertOneResult, error) {
-	if err != nil {
-		return nil, err
-	}
+	m.Metadata.CreatedAt = time.Now().UTC()
 	res, err := MenuCollection.InsertOne(Ctx, &m)
 	if err != nil {
 		IsDup(err)

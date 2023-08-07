@@ -121,3 +121,20 @@ func UpdateMenu(c *gin.Context) {
 	}
 	c.String(200, "menu updated successfully")
 }
+func DeleteMenu(c *gin.Context) {
+	var id string = c.Param("id")
+	objecId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.String(400, "Invalid id")
+		return
+	}
+	menu := db.Menu{
+		Id: objecId,
+	}
+	res, err := menu.Delete()
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, res)
+}

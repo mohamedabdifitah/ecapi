@@ -59,7 +59,7 @@ func ConnectDB() {
 	CreateIndex("phone", DriverCollection)
 	CreateIndex("business_name", MerchantCollection)
 	CreateIndex("business_phone", MerchantCollection)
-	CreateIndex("barcode", MenuCollection)
+	// CreateIndex("barcode", MenuCollection)
 }
 func CloseDB() error {
 	// Ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
