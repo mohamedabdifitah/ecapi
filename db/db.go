@@ -55,6 +55,7 @@ func ConnectDB() {
 	MerchantCollection = ResturantDB.Collection("merchant")
 	MenuCollection = ResturantDB.Collection("menu")
 	ReviewCollection = ResturantDB.Collection("review")
+	OrderCollection = ResturantDB.Collection("order")
 	CreateIndex("email", CustomerCollection)
 	CreateIndex("phone", DriverCollection)
 	CreateIndex("business_name", MerchantCollection)

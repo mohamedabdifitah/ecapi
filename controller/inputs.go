@@ -1,6 +1,8 @@
 package controller
 
-import "github.com/mohamedabdifitah/ecapi/db"
+import (
+	"github.com/mohamedabdifitah/ecapi/db"
+)
 
 type SignUpWithEmailBody struct {
 	Email    string `json:"email" `
@@ -88,4 +90,18 @@ type ReviewBody struct {
 	From       string `json:"from"`
 	Type       string `json:"type"`
 	ExternalId string `json:"external_id"`
+}
+type PlaceOrderBody struct {
+	Items              []Item    `json:"items"`
+	DropOffPhone       string    `json:"dropoff_phone" `
+	DropOffExteranlId  string    `json:"dropoff_external_id"`
+	DropOffContactName string    `json:"dropoff_contact_name"`
+	DropOffAddress     string    `json:"dropoff_address"`  // address 901 Market Street 6th Floor San Francisco, CA 94103
+	DroOffLocation     []float64 `json:"dropoff_location"` // location cordinates. float([123.1312343,-37.2144343])
+	DropOffInstruction string    `json:"dropoff_instructions"`
+	PickUpExternalId   string    `json:"pickup_external_id"`
+}
+type Item struct {
+	ItemExternalId string `json:"item_external_id"`
+	Quantity       uint   `json:"quantity"`
 }

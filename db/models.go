@@ -15,7 +15,7 @@ type Attributes struct {
 }
 
 type Menu struct {
-	Id                 primitive.ObjectID ` bson:"_id,omitempty" json:"id,omitempty"`        // 63f642ac061b6f5f089b3a65
+	Id                 primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Title              string             `json:"title" bson:"title" binding:"max=30,min=1"` // Burger
 	Description        string             `json:"description" bson:"description"`            // Chicken fries contains
 	Status             string             `json:"status" bson:"status"`                      // available , unavailable , banned
@@ -40,28 +40,29 @@ type Item struct {
 	Price          uint   `json:"price" bson:"price"`
 }
 type Order struct {
-	Id                    uint      `bson:"_id,omitempty" json:"id,omitempty"`
-	OrderValue            uint      `json:"order_value" bson:"order_value" ` // Order value is represented as cents 199 = $19.9
-	Items                 []Item    `json:"items" bson:"items"`
-	DropOffPhone          string    `json:"dropoff_phone" bson:"dropoff_phone"`
-	DropOffExteranlId     string    `json:"dropoff_external_id" bson:"dropoff_external_id"`
-	DropOffContactName    string    `json:"dropoff_contact_name" bson:"dropoff_contact_name"`
-	DropOffTimeEstimated  time.Time `json:"dropoff_time_estimated" bson:"dropoff_time_estimated"`
-	DropOffAddress        string    `json:"dropoff_address" bson:"dropoff_address"`   // address 901 Market Street 6th Floor San Francisco, CA 94103
-	DroOffLocation        []float64 `json:"dropoff_location" bson:"dropoff_location"` // location cordinates. float([123.1312343,-37.2144343])
-	DropOffInstruction    string    `json:"dropoff_instructions" bson:"dropoff_instructions"`
-	Stage                 string    `json:"stage" bson:"stage"`                                     // pendding,accepted,preparing,ready,pickuped,deleivered.
-	ActionIfUndeliverable string    `json:"action_if_undeliverable" bson:"action_if_undeliverable"` // return_to_pickup
-	PickupAddress         string    `json:"pickup_address" bson:"pickup_address"`
-	PickUpExternalId      string    `bson:"pickup_external_id" json:"pickup _external_id"`
-	PickUpPhone           string    `bson:"pickup_phone" json:"pickup_phone"`
-	PickUpLocation        []float64 `bson:"pickup_location" json:"pickup_location"`
-	PickupTime            time.Time `bson:"pickup_time" json:"pickup_time"`
-	PickupTimeEstimated   time.Time `bson:"pickup_time_estimated" json:"pickup_time_estimated"`
-	PickupReferenceTag    string    `json:"pickup_reference_tag" bson:"pickup_reference_tag"`
-	DriverPhone           string    `bson:"driver_phone" json:"driver_phone"`
-	DriverAllowedVehicles []string  `json:"driver_allowed_vehicles" bson:"driver_allowed_vehicles" ` // car , motorcycle , walking
-	DriverExternalId      string    `bson:"driver_external_id" json:"driver_external_id" bson:"driver_external_id"`
+	Id                    primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	OrderValue            uint               `json:"order_value" bson:"order_value" ` // Order value is represented as cents 199 = $19.9
+	Items                 []Item             `json:"items" bson:"items"`
+	DropOffPhone          string             `json:"dropoff_phone" bson:"dropoff_phone"`
+	DropOffExteranlId     string             `json:"dropoff_external_id" bson:"dropoff_external_id"`
+	DropOffContactName    string             `json:"dropoff_contact_name" bson:"dropoff_contact_name"`
+	DropOffTimeEstimated  time.Time          `json:"dropoff_time_estimated" bson:"dropoff_time_estimated"`
+	DropOffAddress        string             `json:"dropoff_address" bson:"dropoff_address"`   // address 901 Market Street 6th Floor San Francisco, CA 94103
+	DroOffLocation        Location           `json:"dropoff_location" bson:"dropoff_location"` // location cordinates. float([123.1312343,-37.2144343])
+	DropOffInstruction    string             `json:"dropoff_instructions" bson:"dropoff_instructions"`
+	Stage                 string             `json:"stage" bson:"stage"`                                     // pendding,accepted,preparing,ready,pickuped,deleivered.
+	ActionIfUndeliverable string             `json:"action_if_undeliverable" bson:"action_if_undeliverable"` // return_to_pickup
+	PickupAddress         string             `json:"pickup_address" bson:"pickup_address"`
+	PickUpExternalId      string             `bson:"pickup_external_id" json:"pickup_external_id"`
+	PickUpPhone           string             `bson:"pickup_phone" json:"pickup_phone"`
+	PickUpLocation        Location           `bson:"pickup_location" json:"pickup_location"`
+	PickupTime            time.Time          `bson:"pickup_time" json:"pickup_time"`
+	PickupTimeEstimated   int                `bson:"pickup_time_estimated" json:"pickup_time_estimated"` // seconds
+	PickupReferenceTag    string             `json:"pickup_reference_tag" bson:"pickup_reference_tag"`
+	DriverPhone           string             `bson:"driver_phone" json:"driver_phone"`
+	DriverAllowedVehicles []string           `json:"driver_allowed_vehicles" bson:"driver_allowed_vehicles" ` // car , motorcycle , walking
+	DriverExternalId      string             `bson:"driver_external_id" json:"driver_external_id" bson:"driver_external_id"`
+	Metadata              Metadata           `bson:"metadata" json:"metadata" bson:"metadata"`
 }
 
 type Customer struct {

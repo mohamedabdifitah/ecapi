@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -18,7 +19,7 @@ func (m *Menu) GetById() error {
 // }
 func (m *Menu) Create() (*mongo.InsertOneResult, error) {
 	m.Metadata.CreatedAt = time.Now().UTC()
-	res, err := MenuCollection.InsertOne(Ctx, &m)
+	res, err := MenuCollection.InsertOne(Ctx, m)
 	if err != nil {
 		IsDup(err)
 		return nil, err
@@ -66,6 +67,26 @@ func (m Menu) GetAll() ([]*Menu, error) {
 		// {Key: "attributes", Value: m.Attributes},
 	}
 	cursor, err := MenuCollection.Find(Ctx, bson.D{})
+	if err != nil {
+		return nil, err
+	}
+	for cursor.Next(Ctx) {
+		var menu *Menu
+		err := cursor.Decode(&menu)
+		if err != nil {
+
+			return nil, err
+
+		}
+		menus = append(menus, menu)
+	}
+	cursor.Close(Ctx)
+	return menus, nil
+}
+func GetListMenus(oids []primitive.ObjectID) ([]*Menu, error) {
+	var menus []*Menu
+	query := bson.M{"_id": bson.M{"$in": oids}}
+	cursor, err := MenuCollection.Find(Ctx, query)
 	if err != nil {
 		return nil, err
 	}

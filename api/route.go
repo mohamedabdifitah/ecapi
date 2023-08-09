@@ -11,6 +11,7 @@ func RouterDefinition() {
 	DriverRouteDefinition()
 	MenuRouterDefinition()
 	ReviewRouterDefinition()
+	OrderRouterDefinition()
 }
 func CustomerRouteDefinition() {
 	CustomerRouter.GET("/all", middleware.AuthorizeRolesMiddleware([]string{"admin", "manager"}), controller.GetAllCustomers)
@@ -61,4 +62,18 @@ func ReviewRouterDefinition() {
 	ReviewRouter.POST("/create", controller.CreateReview)
 	ReviewRouter.DELETE("/delete/:id", controller.DeleteReview)
 
+}
+func OrderRouterDefinition() {
+	OrderRouter.GET("/all", controller.GetAllOrders)
+	OrderRouter.GET("/get/:id", controller.GetOrderByid)
+	OrderRouter.POST("/place", controller.PlaceOrder)
+	OrderRouter.GET("/location")       // polygons , longitude and latitude are
+	OrderRouter.POST("/driver/accept") // driver accepts to deliver the request of order
+	OrderRouter.POST("/change/driver")
+	OrderRouter.POST("/change/merchant")
+	OrderRouter.POST("/merchant/decline")
+	OrderRouter.POST("/merchant/accept")
+	OrderRouter.PATCH("/cancel")
+	OrderRouter.GET("/merchant/get/all/:id")
+	OrderRouter.GET("/driver/get/all/:id")
 }
