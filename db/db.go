@@ -60,6 +60,9 @@ func ConnectDB() {
 	CreateIndex("phone", DriverCollection)
 	CreateIndex("business_name", MerchantCollection)
 	CreateIndex("business_phone", MerchantCollection)
+	CreateGeoIndex("location", MerchantCollection)
+	CreateGeoIndex("dropoff_location", OrderCollection)
+	CreateGeoIndex("pickup_location", OrderCollection)
 	// CreateIndex("barcode", MenuCollection)
 }
 func CloseDB() error {
@@ -74,6 +77,17 @@ func CreateIndex(name string, Collection *mongo.Collection) {
 		mongo.IndexModel{
 			Keys:    bson.D{{Key: name, Value: 1}},
 			Options: options.Index().SetUnique(true),
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
+}
+func CreateGeoIndex(name string, Collection *mongo.Collection) {
+	_, err := Collection.Indexes().CreateOne(
+		Ctx,
+		mongo.IndexModel{
+			Keys: bson.D{{Key: name, Value: "2dsphere"}},
 		},
 	)
 	if err != nil {
