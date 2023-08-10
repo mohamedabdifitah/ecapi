@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/mohamedabdifitah/ecapi/api"
 	"github.com/mohamedabdifitah/ecapi/db"
+	"github.com/mohamedabdifitah/ecapi/mq"
 )
 
 func main() {
@@ -18,6 +19,7 @@ func main() {
 
 	}
 	db.ConnectDB()
+	mq.ConnectMQ()
 	api.Initserver()
 
 }
