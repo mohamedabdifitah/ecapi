@@ -103,3 +103,23 @@ func GetListMenus(oids []primitive.ObjectID) ([]*Menu, error) {
 	cursor.Close(Ctx)
 	return menus, nil
 }
+func (m Menu) GetFromMerchant() ([]*Menu, error) {
+	var menus []*Menu
+	query := bson.M{"merchant_external_id": m.MerchantExternalId}
+	cursor, err := MenuCollection.Find(Ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	for cursor.Next(Ctx) {
+		var menu *Menu
+		err := cursor.Decode(&menu)
+		if err != nil {
+
+			return nil, err
+
+		}
+		menus = append(menus, menu)
+	}
+	cursor.Close(Ctx)
+	return menus, nil
+}

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mohamedabdifitah/ecapi/mq"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -188,6 +187,5 @@ func (o *Order) PlaceOrder() (*mongo.InsertOneResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	mq.PublishOrder[*Order](o, "new order")
 	return res, nil
 }

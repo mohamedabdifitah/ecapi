@@ -48,9 +48,11 @@ func DriverRouteDefinition() {
 func MenuRouterDefinition() {
 	MenuRouter.GET("/get/:id", controller.GetMenu)
 	MenuRouter.GET("/all", controller.GetMenus)
+	MenuRouter.GET("/merchant/:id", controller.GetMenuFromMerchant)
 	MenuRouter.POST("/create", controller.CreateMenu)
 	MenuRouter.DELETE("/delete/:id", controller.DeleteMenu)
 	MenuRouter.PUT("/update/:id", controller.UpdateMenu)
+	MenuRouter.PUT("/image/add/:id", controller.PutImageMenues)
 }
 
 func ReviewRouterDefinition() {

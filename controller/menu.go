@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -137,4 +139,45 @@ func DeleteMenu(c *gin.Context) {
 		return
 	}
 	c.JSON(200, res)
+}
+func GetMenuFromMerchant(c *gin.Context) {
+	id := c.Param("id")
+	menu := db.Menu{
+		MerchantExternalId: id,
+	}
+	menues, err := menu.GetFromMerchant()
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, menues)
+}
+func PutImageMenues(c *gin.Context) {
+	// Multipart form
+	id := c.Param("id")
+	objecid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	file, err := c.FormFile("upload")
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	log.Println(file.Filename)
+
+	// Upload the file to specific dst.
+	c.SaveUploadedFile(file, fmt.Sprintf("C:/Users/Pc/Desktop/%s", file.Filename))
+	menu := db.Menu{
+		Id:     objecid,
+		Images: []string{fmt.Sprintf("C:/Users/Pc/Desktop/%s", file.Filename)},
+	}
+	res, err := menu.SetImages()
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, res)
+	// c.String(http.StatusOK, fmt.Sprintf("%d files uploaded!", len(files)))
 }

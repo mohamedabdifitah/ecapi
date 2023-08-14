@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /   #new 
+  name: nginx-ingress
+  namespace: example-app
+spec:
+  tls:
+  - hosts:
+    - ecapi.api
+    secretName: marcel-tls-secret
+  rules:
+  - host: ecapi.api
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName:  ecapi-service
+          servicePort: 80
+      - path: /v2/hello
+        backend:
+          serviceName:  ecapi-service
+          servicePort: 80

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecapi-deployment
+  labels:
+    app: ecapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecapi
+  template:
+    metadata:
+      labels:
+        app: ecapi
+    spec:
+      containers:
+      - name: ecapi
+        image: ecapi:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        env:
+        - name: DB_URI
+          value: "mongodb://host.docker.internal:27017"
+        - name: TOKEN_REF_SECRET
+          value: "refreshToken"
+        - name: TOKEN_ACCESS_SECRET 
+          value:  "secret"
+        - name: PORT 
+          value:  "80"
