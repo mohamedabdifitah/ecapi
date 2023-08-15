@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
@@ -168,10 +169,10 @@ func PutImageMenues(c *gin.Context) {
 	log.Println(file.Filename)
 
 	// Upload the file to specific dst.
-	c.SaveUploadedFile(file, fmt.Sprintf("C:/Users/Pc/Desktop/%s", file.Filename))
+	c.SaveUploadedFile(file, fmt.Sprintf("%s/%s", os.Getenv("STATIC_URL"), file.Filename))
 	menu := db.Menu{
 		Id:     objecid,
-		Images: []string{fmt.Sprintf("C:/Users/Pc/Desktop/%s", file.Filename)},
+		Images: []string{fmt.Sprintf("%s/%s", os.Getenv("STATIC_URL"), file.Filename)},
 	}
 	res, err := menu.SetImages()
 	if err != nil {

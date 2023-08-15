@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -122,4 +123,14 @@ func (m Menu) GetFromMerchant() ([]*Menu, error) {
 	}
 	cursor.Close(Ctx)
 	return menus, nil
+}
+func (m Menu) SetImages() (*mongo.UpdateResult, error) {
+	query := bson.M{"_id": m.Id}
+	fmt.Println(m.Images)
+	change := bson.M{"$push": bson.M{"images": bson.M{"$each": m.Images}}}
+	result, err := MenuCollection.UpdateOne(Ctx, query, change)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

@@ -20,7 +20,7 @@ type Menu struct {
 	Description        string             `json:"description" bson:"description"`            // Chicken fries contains
 	Status             string             `json:"status" bson:"status"`                      // available , unavailable , banned
 	Category           string             `json:"category" bson:"category"`                  // fast food , drink ,
-	Images             []string           `json:"image" bson:"image"`                        // Images of the product urls
+	Images             []string           `json:"images" bson:"images"`                      // Images of the product urls
 	Price              uint               `json:"price" bson:"price"`                        // the price of the product is represented as cents 99 = $0.99
 	Attributes         Attributes         `json:"attributes" bson:"attributes"`
 	Metadata           Metadata           `json:"metadata" bson:"metadata"`

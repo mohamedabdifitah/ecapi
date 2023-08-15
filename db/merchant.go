@@ -232,12 +232,3 @@ func (m *Merchant) GetMerchantByLocation(location []float64, maxdist int64, mind
 	cursor.Close(Ctx)
 	return merchants, nil
 }
-func (m Menu) SetImages() (*mongo.UpdateResult, error) {
-	query := bson.M{"_id": m.Id}
-	change := bson.M{"$push": bson.M{"images": bson.M{"$each": m.Images}}}
-	result, err := MerchantCollection.UpdateOne(Ctx, query, change)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
