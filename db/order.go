@@ -1,9 +1,11 @@
 package db
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
+	"github.com/mohamedabdifitah/ecapi/service"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -187,5 +189,10 @@ func (o *Order) PlaceOrder() (*mongo.InsertOneResult, error) {
 	if err != nil {
 		return nil, err
 	}
+	j, err := json.Marshal(o)
+	if err != nil {
+		panic(err)
+	}
+	service.PublishTopic("new-order", j)
 	return res, nil
 }

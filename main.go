@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/mohamedabdifitah/ecapi/api"
 	"github.com/mohamedabdifitah/ecapi/db"
+	"github.com/mohamedabdifitah/ecapi/service"
 )
 
 func main() {
@@ -17,6 +18,7 @@ func main() {
 		}
 
 	}
+	service.InitRedisClient()
 	db.ConnectDB()
 	api.Initserver()
 
