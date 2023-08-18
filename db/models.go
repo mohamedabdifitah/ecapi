@@ -98,7 +98,7 @@ type Driver struct {
 	Age         primitive.DateTime `json:"age" bson:"age"`
 	Address     string             `json:"address" bson:"address"`
 	Metadata    AccountMetadata    `json:"metadata" bson:"metadata"`
-	Device      Device             `json:"deivice" bson:"deivice"`
+	Device      Device             `json:"-" bson:"device"`
 }
 type Merchant struct {
 	Id                primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65

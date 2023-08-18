@@ -37,7 +37,7 @@ func (d *Driver) GetById() error {
 	query := bson.M{"_id": d.Id}
 	result := DriverCollection.FindOne(
 		Ctx, query, options.FindOne().SetProjection(
-			ProtectFields("password", "devices", "metadata.token_version", "metadata.provider"),
+			ProtectFields("password", "device", "metadata.token_version", "metadata.provider"),
 		))
 	err := result.Decode(&d)
 	return err
@@ -52,7 +52,7 @@ func (d *Driver) Delete() (*mongo.DeleteResult, error) {
 }
 func (d *Driver) GetAll() ([]*Driver, error) {
 	var drivers []*Driver
-	cursor, err := DriverCollection.Find(Ctx, bson.D{}, options.Find().SetProjection(ProtectFields("password", "devices", "metadata.token_version", "metadata.provider")))
+	cursor, err := DriverCollection.Find(Ctx, bson.D{}, options.Find().SetProjection(ProtectFields("password", "device", "metadata.token_version", "metadata.provider")))
 	if err != nil {
 		return nil, err
 	}
@@ -196,4 +196,11 @@ func DriverLoginCheck(phone string, password string, device Device) (*TokenRespo
 		return nil, res
 	}
 	return t, nil
+}
+func UpdateDriver(query bson.M, change bson.D) (*mongo.UpdateResult, error) {
+	res, err := DriverCollection.UpdateOne(Ctx, query, change)
+	if err != nil {
+		return nil, err
+	}
+	return res, err
 }

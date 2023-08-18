@@ -2,9 +2,11 @@ package controller
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -177,4 +179,31 @@ func CustomerEmailLogin(c *gin.Context) {
 		return
 	}
 	c.JSON(200, tokens)
+}
+func ChangeCustomerDevice(c *gin.Context) {
+	id := c.Param("id")
+	var body map[string]interface{}
+	objectid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.String(400, "Invalid id")
+		return
+	}
+	err = c.ShouldBindJSON(&body)
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	query := bson.M{
+		"_id": objectid,
+	}
+	update := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "metadata.update_at", Value: time.Now()},
+		{Key: "device", Value: body["device"]},
+	}}}
+	res, err := db.UpdateCustomer(query, update)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, res)
 }

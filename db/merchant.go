@@ -37,7 +37,7 @@ func (m *Merchant) GetById() error {
 	query := bson.M{"_id": m.Id}
 	result := MerchantCollection.FindOne(
 		Ctx, query, options.FindOne().SetProjection(
-			ProtectFields("password", "devices", "metadata.token_version", "metadata.provider"),
+			ProtectFields("password", "device", "metadata.token_version", "metadata.provider"),
 		))
 	err := result.Decode(&m)
 	return err
@@ -52,7 +52,7 @@ func (m *Merchant) Delete() (*mongo.DeleteResult, error) {
 }
 func (m *Merchant) GetAll() ([]*Merchant, error) {
 	var merchants []*Merchant
-	cursor, err := MerchantCollection.Find(Ctx, bson.D{}, options.Find().SetProjection(ProtectFields("password", "devices", "metadata.token_version", "metadata.provider")))
+	cursor, err := MerchantCollection.Find(Ctx, bson.D{}, options.Find().SetProjection(ProtectFields("password", "device", "metadata.token_version", "metadata.provider")))
 	if err != nil {
 		return nil, err
 	}
@@ -215,7 +215,7 @@ func (m *Merchant) GetMerchantByLocation(location []float64, maxdist int64, mind
 			},
 		}},
 	}
-	cursor, err := MerchantCollection.Find(Ctx, filter, options.Find().SetProjection(ProtectFields("password", "devices", "metadata.token_version", "metadata.provider")))
+	cursor, err := MerchantCollection.Find(Ctx, filter, options.Find().SetProjection(ProtectFields("password", "device", "metadata.token_version", "metadata.provider")))
 	if err != nil {
 		return nil, err
 	}
@@ -231,4 +231,11 @@ func (m *Merchant) GetMerchantByLocation(location []float64, maxdist int64, mind
 	}
 	cursor.Close(Ctx)
 	return merchants, nil
+}
+func UpdateMerchant(query bson.M, change bson.D) (*mongo.UpdateResult, error) {
+	res, err := MerchantCollection.UpdateOne(Ctx, query, change)
+	if err != nil {
+		return nil, err
+	}
+	return res, err
 }

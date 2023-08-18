@@ -22,6 +22,7 @@ func CustomerRouteDefinition() {
 	CustomerRouter.DELETE("/delete/:id", controller.DeleteCustomer)
 	CustomerRouter.POST("/signup/email", controller.SignUpCustomerWithEmail)
 	CustomerRouter.POST("/signin/email", controller.CustomerEmailLogin)
+	CustomerRouter.PATCH("/device/change/:id", controller.ChangeCustomerDevice)
 }
 func MerchantRouteDefinition() {
 	MerchantRouter.GET("/all", controller.GetAllMerchants)
@@ -33,6 +34,7 @@ func MerchantRouteDefinition() {
 	MerchantRouter.DELETE("/delete/:id", controller.DeleteMerchant)
 	MerchantRouter.POST("/signup/phone", controller.SignUpMerchantWithPhone)
 	MerchantRouter.POST("/signin/phone", controller.MerchantPhoneLogin)
+	MerchantRouter.PATCH("/device/change/:id", controller.ChangeMerchantDevice)
 }
 func DriverRouteDefinition() {
 	DriverRouter.GET("/all", controller.GetAllDrivers)
@@ -44,6 +46,7 @@ func DriverRouteDefinition() {
 	DriverRouter.DELETE("/delete/:id", controller.DeleteDriver)
 	DriverRouter.POST("/signup", controller.SignUpDriverWithPhone)
 	DriverRouter.POST("/signin/phone", controller.DriverPhoneLogin)
+	DriverRouter.PATCH("/device/change/:id", controller.ChangeDriverDevice)
 }
 func MenuRouterDefinition() {
 	MenuRouter.GET("/get/:id", controller.GetMenu)
