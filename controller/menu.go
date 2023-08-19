@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
+	"github.com/mohamedabdifitah/ecapi/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -180,5 +183,46 @@ func PutImageMenues(c *gin.Context) {
 		return
 	}
 	c.JSON(200, res)
-	// c.String(http.StatusOK, fmt.Sprintf("%d files uploaded!", len(files)))
+}
+func AddMenuImages(c *gin.Context) {
+	id := c.Param("id")
+	objectid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	form, _ := c.MultipartForm()
+	files := form.File["photos"]
+	res, errres := utils.UploadPhotos(files)
+	if errres != nil {
+		c.String(errres.StatusCode, errres.Reason.Error())
+		return
+	}
+	body := &bytes.Buffer{}
+	_, err = body.ReadFrom(res.Body)
+	if err != nil {
+		c.String(500, "error uploading file, please try again")
+		return
+	}
+	res.Body.Close()
+	_ = db.Menu{
+		Id:     objectid,
+		Images: []string{},
+	}
+	var photosUri []string
+	err = json.Unmarshal(body.Bytes(), &photosUri)
+	if err != nil {
+		c.String(500, "error unmarshalling photos , please try again")
+		return
+	}
+	menu := db.Menu{
+		Id:     objectid,
+		Images: photosUri,
+	}
+	response, err := menu.SetImages()
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, response)
 }
