@@ -1,12 +1,14 @@
 package controller
 
 import (
+	"bytes"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
+	"github.com/mohamedabdifitah/ecapi/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -232,4 +234,40 @@ func ChangeMerchantDevice(c *gin.Context) {
 		return
 	}
 	c.JSON(200, res)
+}
+func ChangeMerchantProfile(c *gin.Context) {
+	id := c.Param("id")
+	objectid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.String(400, "Invalid id ")
+		return
+	}
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	response, ErrorResponse := utils.UploadFile(file)
+	if err != nil {
+		c.String(ErrorResponse.StatusCode, ErrorResponse.Reason.Error())
+		return
+	}
+	body := &bytes.Buffer{}
+	_, err = body.ReadFrom(response.Body)
+	if err != nil {
+		c.String(500, "error uploading file, please try again")
+		return
+	}
+	response.Body.Close()
+	query := bson.M{"_id": objectid}
+	update := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "metadata.update_at", Value: time.Now()},
+		{Key: "profile", Value: body.String()},
+	}}}
+	confirm, err := db.UpdateMerchant(query, update)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, confirm)
 }

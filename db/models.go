@@ -98,6 +98,7 @@ type Driver struct {
 	Age         primitive.DateTime `json:"age" bson:"age"`
 	Address     string             `json:"address" bson:"address"`
 	Metadata    AccountMetadata    `json:"metadata" bson:"metadata"`
+	Profile     string             `json:"profile" bson:"profile"`
 	Device      Device             `json:"-" bson:"device"`
 }
 type Merchant struct {
@@ -111,6 +112,7 @@ type Merchant struct {
 	TimeOperatorEnd   int                `bson:"time_operation_end" json:"time_operation_end"`     // 2320 => 23:30 UTC
 	Metadata          AccountMetadata    `bson:"metadata" json:"metadata"`
 	Password          string             `json:"-" bson:"password"`
+	Profile           string             `json:"profile" bson:"profile"`
 	Device            Device             `json:"-" bson:"device"`
 }
 type Review struct {
