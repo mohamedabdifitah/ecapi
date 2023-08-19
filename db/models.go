@@ -51,7 +51,7 @@ type Order struct {
 	DropOffAddress        string             `json:"dropoff_address" bson:"dropoff_address"`   // address 901 Market Street 6th Floor San Francisco, CA 94103
 	DroOffLocation        Location           `json:"dropoff_location" bson:"dropoff_location"` // location cordinates. float([123.1312343,-37.2144343])
 	DropOffInstruction    string             `json:"dropoff_instructions" bson:"dropoff_instructions"`
-	Stage                 string             `json:"stage" bson:"stage"`                                     // pendding,accepted,preparing,ready,pickuped,deleivered.
+	Stage                 string             `json:"stage" bson:"stage"`                                     // pendding,accepted,preparing,ready,pickuped,deleivered,csncelled.
 	ActionIfUndeliverable string             `json:"action_if_undeliverable" bson:"action_if_undeliverable"` // return_to_pickup
 	PickupAddress         string             `json:"pickup_address" bson:"pickup_address"`
 	PickUpExternalId      string             `bson:"pickup_external_id" json:"pickup_external_id"`

@@ -100,6 +100,7 @@ type PlaceOrderBody struct {
 	DroOffLocation     []float64 `json:"dropoff_location"` // location cordinates. float([123.1312343,-37.2144343])
 	DropOffInstruction string    `json:"dropoff_instructions"`
 	PickUpExternalId   string    `json:"pickup_external_id"`
+	Type               string    `json:"type"`
 }
 type Item struct {
 	ItemExternalId string `json:"item_external_id"`

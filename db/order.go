@@ -149,10 +149,13 @@ func (o *Order) PlaceOrder() (*mongo.InsertOneResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	j, err := json.Marshal(o)
+	// answer from https://www.mongodb.com/community/forums/t/insertone-returns-interface/131263/3
+	o.Id = res.InsertedID.(primitive.ObjectID)
+	json, err := json.Marshal(o)
+
 	if err != nil {
 		panic(err)
 	}
-	service.PublishTopic("new-order", j)
+	service.PublishTopic("new-order", json)
 	return res, nil
 }

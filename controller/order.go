@@ -73,6 +73,7 @@ func PlaceOrder(c *gin.Context) {
 		},
 		DropOffInstruction: body.DropOffInstruction,
 		PickUpExternalId:   body.PickUpExternalId,
+		Type:               body.Type,
 	}
 	res, err := order.PlaceOrder()
 	if err != nil {
@@ -117,4 +118,9 @@ func GetOrderByDriver(c *gin.Context) {
 		return
 	}
 	c.JSON(200, orders)
+}
+func DriverAcceptOrder(c *gin.Context) {
+	// driver information
+	// order information => weighting order information => vehicle type
+	// notifying redis subscribers
 }
