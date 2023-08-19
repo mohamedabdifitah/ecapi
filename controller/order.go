@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -25,8 +26,8 @@ func GetOrderByid(c *gin.Context) {
 
 }
 func GetAllOrders(c *gin.Context) {
-	order := db.Order{}
-	orders, err := order.GetAll()
+	filter := bson.D{}
+	orders, err := db.GetOrdersBy(filter)
 	if err != nil {
 		c.String(500, err.Error())
 		return
@@ -80,4 +81,40 @@ func PlaceOrder(c *gin.Context) {
 	}
 	c.JSON(201, res)
 
+}
+func GetOrderByCustomer(c *gin.Context) {
+	id := c.Param("id")
+	filter := bson.D{
+		{Key: "dropoff_external_id", Value: id},
+	}
+	orders, err := db.GetOrdersBy(filter)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, orders)
+}
+func GetOrderByMerchant(c *gin.Context) {
+	id := c.Param("id")
+	filter := bson.D{
+		{Key: "pickup_external_id", Value: id},
+	}
+	orders, err := db.GetOrdersBy(filter)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, orders)
+}
+func GetOrderByDriver(c *gin.Context) {
+	id := c.Param("id")
+	filter := bson.D{
+		{Key: "driver_external_id", Value: id},
+	}
+	orders, err := db.GetOrdersBy(filter)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, orders)
 }

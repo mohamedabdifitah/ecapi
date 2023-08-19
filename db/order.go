@@ -18,48 +18,8 @@ func (o *Order) GetById() error {
 	err := result.Decode(&o)
 	return err
 }
-func (o Order) GetAll() ([]*Order, error) {
+func GetOrdersBy(filter bson.D) ([]*Order, error) {
 	var orders []*Order
-	cursor, err := OrderCollection.Find(Ctx, bson.D{})
-	if err != nil {
-		return nil, err
-	}
-	for cursor.Next(Ctx) {
-		var order *Order
-		err := cursor.Decode(&order)
-		if err != nil {
-			return nil, err
-		}
-		orders = append(orders, order)
-	}
-	cursor.Close(Ctx)
-	return orders, nil
-}
-func (o *Order) GetByMerchant() ([]*Order, error) {
-	var orders []*Order
-	filter := bson.D{
-		{Key: "pickup _external_id", Value: o.PickUpExternalId},
-	}
-	cursor, err := OrderCollection.Find(Ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-	for cursor.Next(Ctx) {
-		var order *Order
-		err := cursor.Decode(&order)
-		if err != nil {
-			return nil, err
-		}
-		orders = append(orders, order)
-	}
-	cursor.Close(Ctx)
-	return orders, nil
-}
-func (o *Order) GetByCustomer() ([]*Order, error) {
-	var orders []*Order
-	filter := bson.D{
-		{Key: "dropoff_external_id", Value: o.DropOffExteranlId},
-	}
 	cursor, err := OrderCollection.Find(Ctx, filter)
 	if err != nil {
 		return nil, err

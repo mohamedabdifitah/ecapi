@@ -42,6 +42,7 @@ type Item struct {
 type Order struct {
 	Id                    primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	OrderValue            uint               `json:"order_value" bson:"order_value" ` // Order value is represented as cents 199 = $19.9
+	Type                  string             `json:"type" bson:"type"`                // pickup or delivery order
 	Items                 []Item             `json:"items" bson:"items"`
 	DropOffPhone          string             `json:"dropoff_phone" bson:"dropoff_phone"`
 	DropOffExteranlId     string             `json:"dropoff_external_id" bson:"dropoff_external_id"`
@@ -61,7 +62,7 @@ type Order struct {
 	PickupReferenceTag    string             `json:"pickup_reference_tag" bson:"pickup_reference_tag"`
 	DriverPhone           string             `bson:"driver_phone" json:"driver_phone"`
 	DriverAllowedVehicles []string           `json:"driver_allowed_vehicles" bson:"driver_allowed_vehicles" ` // car , motorcycle , walking
-	DriverExternalId      string             `bson:"driver_external_id" json:"driver_external_id" bson:"driver_external_id"`
+	DriverExternalId      string             `bson:"driver_external_id" json:"driver_external_id"`
 	Metadata              Metadata           `bson:"metadata" json:"metadata" bson:"metadata"`
 }
 
