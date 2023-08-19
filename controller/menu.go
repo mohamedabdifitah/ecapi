@@ -205,10 +205,6 @@ func AddMenuImages(c *gin.Context) {
 		return
 	}
 	res.Body.Close()
-	_ = db.Menu{
-		Id:     objectid,
-		Images: []string{},
-	}
 	var photosUri []string
 	err = json.Unmarshal(body.Bytes(), &photosUri)
 	if err != nil {
