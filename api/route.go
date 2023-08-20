@@ -77,8 +77,8 @@ func OrderRouterDefinition() {
 	OrderRouter.GET("/get/:id", controller.GetOrderByid)
 	OrderRouter.POST("/place", controller.PlaceOrder)
 	OrderRouter.GET("/customer/all/:id", controller.GetOrderByCustomer)
-	OrderRouter.GET("/location")       // polygons , longitude and latitude are
-	OrderRouter.POST("/driver/accept") // driver accepts to deliver the request of order
+	OrderRouter.GET("/location", controller.GetOrderByLocation) // polygons , longitude and latitude are
+	OrderRouter.POST("/driver/accept")                          // driver accepts to deliver the request of order
 	OrderRouter.POST("/change/driver")
 	OrderRouter.POST("/change/merchant")
 	OrderRouter.POST("/merchant/decline")

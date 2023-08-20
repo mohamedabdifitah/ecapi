@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
 	"go.mongodb.org/mongo-driver/bson"
@@ -123,4 +126,24 @@ func DriverAcceptOrder(c *gin.Context) {
 	// driver information
 	// order information => weighting order information => vehicle type
 	// notifying redis subscribers
+}
+func GetOrderByLocation(c *gin.Context) {
+	longtitude, err := strconv.ParseFloat(c.Query("lang"), 64)
+	latitude, err := strconv.ParseFloat(c.Query("lat"), 64)
+	mindist, err := strconv.ParseInt(c.Query("mindist"), 0, 64)
+	maxdist, err := strconv.ParseInt(c.Query("maxdist"), 0, 64)
+	fmt.Println(maxdist, mindist)
+	if err != nil {
+		c.String(400, err.Error())
+	}
+	var order db.Order
+	location := []float64{
+		longtitude,
+		latitude,
+	}
+	orders, err := order.GetByLocation(location, maxdist, mindist)
+	if err != nil {
+		c.String(500, err.Error())
+	}
+	c.JSON(200, orders)
 }

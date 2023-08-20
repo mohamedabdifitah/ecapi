@@ -38,15 +38,9 @@ func GetOrdersBy(filter bson.D) ([]*Order, error) {
 func (o *Order) GetByLocation(location []float64, maxdist int64, mindist int64) ([]*Order, error) {
 	var orders []*Order
 	filter := bson.D{
-		{Key: "location", Value: bson.D{
+		{Key: "pickup_location", Value: bson.D{
 			{
 				Key: "$near", Value: bson.D{
-					{
-						Key: "$maxDistance", Value: maxdist,
-					},
-					{
-						Key: "$minDistance", Value: mindist,
-					},
 					{
 						Key: "$geometry", Value: bson.D{
 							{
@@ -56,6 +50,12 @@ func (o *Order) GetByLocation(location []float64, maxdist int64, mindist int64) 
 								Key: "coordinates", Value: location,
 							},
 						},
+					},
+					{
+						Key: "$maxDistance", Value: maxdist,
+					},
+					{
+						Key: "$minDistance", Value: mindist,
 					},
 				},
 			},
