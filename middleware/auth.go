@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ import (
 func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenHeader := c.GetHeader("Authorization")
+		id := c.GetHeader("ssid")
 		if tokenHeader == "" && len(strings.Split(tokenHeader, " ")) < 2 {
 			c.String(401, "authorization key not found")
 			c.Abort()
@@ -23,6 +25,12 @@ func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 		token, err := utils.VerifyAccessToken(tokenString)
 		if err != nil {
 			c.String(401, err.Error())
+			c.Abort()
+			return
+		}
+		fmt.Println(token.Id)
+		if id != token.Id {
+			c.String(403, "Authentication Error")
 			c.Abort()
 			return
 		}

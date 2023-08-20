@@ -154,8 +154,56 @@ func (o *Order) PlaceOrder() (*mongo.InsertOneResult, error) {
 	json, err := json.Marshal(o)
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	service.PublishTopic("new-order", json)
+	return res, nil
+}
+func UpdateOrder(query bson.M, change bson.D) (*mongo.UpdateResult, error) {
+	res, err := OrderCollection.UpdateOne(Ctx, query, change)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+func AccpetOrderBy(query bson.M, change bson.D, topic string) (*mongo.UpdateResult, error) {
+	res, err := UpdateOrder(query, change)
+	if err != nil {
+		return nil, err
+	}
+	service.PublishTopic(topic, topic)
+	return res, nil
+}
+func AssignOrderToDriver(orderId primitive.ObjectID, driverId primitive.ObjectID) (*mongo.UpdateResult, *ErrorResponse) {
+	order := Order{
+		Id: orderId,
+	}
+	err := order.GetById()
+	if err != nil {
+		return nil, &ErrorResponse{Message: err, Status: 400}
+	}
+	if order.Stage == "canceled" {
+		return nil, &ErrorResponse{Message: fmt.Errorf("order is canceled"), Status: 403, Type: "string"}
+	}
+	if order.DriverExternalId != "" && order.DriverPhone != "" {
+		return nil, &ErrorResponse{Message: fmt.Errorf("order already assigned to another driver"), Status: 409, Type: "string"}
+	}
+	driver := Driver{
+		Id: driverId,
+	}
+	err = driver.GetById()
+	if err != nil {
+		return nil, &ErrorResponse{Message: err, Status: 400}
+	}
+	query := bson.M{"_id": order.Id}
+	change := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "metadata.update_at", Value: time.Now()},
+		{Key: "driver_external_id", Value: driver.Id.Hex()},
+		{Key: "driver_phone", Value: driver.Phone},
+	}}}
+	res, err := AccpetOrderBy(query, change, "driver-accepted")
+	if err != nil {
+		return nil, &ErrorResponse{Message: err, Status: 500}
+	}
 	return res, nil
 }

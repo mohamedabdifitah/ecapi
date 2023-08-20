@@ -77,12 +77,13 @@ func OrderRouterDefinition() {
 	OrderRouter.GET("/get/:id", controller.GetOrderByid)
 	OrderRouter.POST("/place", controller.PlaceOrder)
 	OrderRouter.GET("/customer/all/:id", controller.GetOrderByCustomer)
-	OrderRouter.GET("/location", controller.GetOrderByLocation) // polygons , longitude and latitude are
-	OrderRouter.POST("/driver/accept")                          // driver accepts to deliver the request of order
+	OrderRouter.GET("/location", controller.GetOrderByLocation)                                                                     // polygons , longitude and latitude are
+	OrderRouter.POST("/driver/accept/:id", middleware.AuthorizeRolesMiddleware([]string{"driver"}), controller.AccpetOrderByDriver) // driver accepts to deliver the request of order
+	OrderRouter.POST("/assign/:oid/:did", middleware.AuthorizeRolesMiddleware([]string{"merchant", "admin"}), controller.AssignOrderToDriver)
 	OrderRouter.POST("/change/driver")
 	OrderRouter.POST("/change/merchant")
 	OrderRouter.POST("/merchant/decline")
-	OrderRouter.POST("/merchant/accept")
+	OrderRouter.PATCH("/merchant/accept/:id", middleware.AuthorizeRolesMiddleware([]string{"merchant"}), controller.MerchantOrderAccept)
 	OrderRouter.PATCH("/cancel")
 	OrderRouter.GET("/merchant/all/:id", controller.GetOrderByMerchant)
 	OrderRouter.GET("/driver/all/:id", controller.GetOrderByDriver)

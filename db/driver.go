@@ -174,7 +174,7 @@ func DriverLoginCheck(phone string, password string, device Device) (*TokenRespo
 		}
 		return nil, res
 	}
-	token, err := utils.GenerateAccessToken(driver.Phone, driver.Id, Roles[0])
+	token, err := utils.GenerateAccessToken(driver.Phone, driver.Id, Roles[1])
 	if err != nil {
 		res := &ErrorResponse{
 			Status:  500,

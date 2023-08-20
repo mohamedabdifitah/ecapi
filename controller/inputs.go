@@ -106,3 +106,7 @@ type Item struct {
 	ItemExternalId string `json:"item_external_id"`
 	Quantity       uint   `json:"quantity"`
 }
+type AccOrderMerchantBody struct {
+	OrderId    string `json:"order_id"`
+	MerchantId string `json:"merchant_id"`
+}

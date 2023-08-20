@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
@@ -146,4 +147,74 @@ func GetOrderByLocation(c *gin.Context) {
 		c.String(500, err.Error())
 	}
 	c.JSON(200, orders)
+}
+func MerchantOrderAccept(c *gin.Context) {
+	OrderId := c.Param("id")
+	var merchantid string = c.GetHeader("ssid")
+	objectid, err := primitive.ObjectIDFromHex(OrderId)
+	if err != nil {
+		c.String(400, "invalid Order Id")
+		return
+	}
+	query := bson.M{"_id": objectid, "pickup_external_id": merchantid}
+	change := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "metadata.update_at", Value: time.Now()},
+		{Key: "stage", Value: "accepted"},
+	}}}
+	res, err := db.AccpetOrderBy(query, change, "merchant-accpted")
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	c.JSON(200, res)
+}
+func AssignOrderToDriver(c *gin.Context) {
+	OrderId := c.Param("oid")
+	DriverId := c.Param("did")
+	DriverObjId, err := primitive.ObjectIDFromHex(DriverId)
+	if err != nil {
+		c.String(400, "invalid driver Id")
+		return
+	}
+
+	objectid, err := primitive.ObjectIDFromHex(OrderId)
+	if err != nil {
+		c.String(400, "invalid Order Id")
+		return
+	}
+	res, erres := db.AssignOrderToDriver(objectid, DriverObjId)
+	if erres != nil {
+		if erres.Type == "string" {
+			c.String(erres.Status, erres.Message.Error())
+			return
+		}
+		c.JSON(erres.Status, erres.Message.Error())
+		return
+	}
+	c.JSON(200, res)
+}
+func AccpetOrderByDriver(c *gin.Context) {
+	DriverId := c.GetHeader("ssid")
+	OrderId := c.Param("id")
+	DriverObjId, err := primitive.ObjectIDFromHex(DriverId)
+	if err != nil {
+		c.String(400, "invalid driver Id")
+		return
+	}
+
+	objectid, err := primitive.ObjectIDFromHex(OrderId)
+	if err != nil {
+		c.String(400, "invalid Order Id")
+		return
+	}
+	res, erres := db.AssignOrderToDriver(objectid, DriverObjId)
+	if erres != nil {
+		if erres.Type == "string" {
+			c.String(erres.Status, erres.Message.Error())
+			return
+		}
+		c.JSON(erres.Status, erres.Message.Error())
+		return
+	}
+	c.JSON(200, res)
 }

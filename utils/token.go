@@ -37,7 +37,7 @@ func GenerateAccessToken(email string, id primitive.ObjectID, role string) (stri
 		// add custom claims like user_id or email,
 		// it can vary according to requirements
 
-		Id:    id.String(),
+		Id:    id.Hex(),
 		Email: email,
 		Role:  role,
 	}
