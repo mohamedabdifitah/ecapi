@@ -41,6 +41,7 @@ func MerchantRouteDefinition() {
 }
 func DriverRouteDefinition() {
 	DriverRouter.GET("/all", controller.GetAllDrivers)
+	DriverRouter.GET("/list", controller.GetListDrivers)
 	DriverRouter.GET("/get/:id", controller.GetDriver)
 	DriverRouter.PUT("/update/:id", controller.UpdateDriver)
 	DriverRouter.PATCH("/change/password/:id", controller.ChangeDriverPassword)

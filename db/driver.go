@@ -37,7 +37,7 @@ func (d *Driver) GetById() error {
 	query := bson.M{"_id": d.Id}
 	result := DriverCollection.FindOne(
 		Ctx, query, options.FindOne().SetProjection(
-			ProtectFields("password", "device", "metadata.token_version", "metadata.provider"),
+			ProtectFields(CommonProtoctedFields),
 		))
 	err := result.Decode(&d)
 	return err
@@ -50,14 +50,16 @@ func (d *Driver) Delete() (*mongo.DeleteResult, error) {
 	}
 	return result, nil
 }
-func (d *Driver) GetAll() ([]*Driver, error) {
-	var drivers []*Driver
-	cursor, err := DriverCollection.Find(Ctx, bson.D{}, options.Find().SetProjection(ProtectFields("password", "device", "metadata.token_version", "metadata.provider")))
+func GetDrivers(query bson.M, projection []string) ([]map[string]interface{}, error) {
+	var drivers []map[string]interface{}
+	protectedfileds := []string{"password", "metadata.token_version", "metadata.provider"}
+	protectedfileds = append(protectedfileds, projection...)
+	cursor, err := DriverCollection.Find(Ctx, query, options.Find().SetProjection(ProtectFields(protectedfileds)))
 	if err != nil {
 		return nil, err
 	}
 	for cursor.Next(Ctx) {
-		var driver *Driver
+		var driver map[string]interface{}
 		err := cursor.Decode(&driver)
 		if err != nil {
 

@@ -2,7 +2,9 @@ package controller
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,8 +15,7 @@ import (
 )
 
 func GetAllDrivers(c *gin.Context) {
-	var driver *db.Driver
-	drivers, err := driver.GetAll()
+	drivers, err := db.GetDrivers(bson.M{}, []string{"device"})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -276,4 +277,23 @@ func ChangeDriverProfile(c *gin.Context) {
 		return
 	}
 	c.JSON(200, confirm)
+}
+func GetListDrivers(c *gin.Context) {
+	ids := strings.Split(c.Query("ids"), ",")
+	oids := make([]primitive.ObjectID, len(ids))
+	for i, value := range ids {
+		id, err := primitive.ObjectIDFromHex(value)
+		if err != nil {
+			c.String(http.StatusBadRequest, fmt.Sprint("id is invalid ", value))
+			return
+		}
+		oids[i] = id
+	}
+	query := bson.M{"_id": bson.M{"$in": oids}}
+	drivers, err := db.GetDrivers(query, nil)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, drivers)
 }

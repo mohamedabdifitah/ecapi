@@ -37,7 +37,7 @@ func (c *Customer) GetById() error {
 	query := bson.M{"_id": c.Id}
 	result := CustomerCollection.FindOne(
 		Ctx, query, options.FindOne().SetProjection(
-			ProtectFields("password", "device", "metadata.token_version", "metadata.provider"),
+			ProtectFields(CommonProtoctedFields),
 		))
 	err := result.Decode(&c)
 	return err
@@ -52,7 +52,7 @@ func (c *Customer) Delete() (*mongo.DeleteResult, error) {
 }
 func (c *Customer) GetAll() ([]*Customer, error) {
 	var customers []*Customer
-	cursor, err := CustomerCollection.Find(Ctx, bson.D{}, options.Find().SetProjection(ProtectFields("password", "device", "metadata.token_version", "metadata.provider")))
+	cursor, err := CustomerCollection.Find(Ctx, bson.D{}, options.Find().SetProjection(ProtectFields(CommonProtoctedFields)))
 	if err != nil {
 		return nil, err
 	}

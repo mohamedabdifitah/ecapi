@@ -8,7 +8,7 @@ import (
 )
 
 func TestProtectFields(t *testing.T) {
-	exclude := ProtectFields("password", "devices")
+	exclude := ProtectFields([]string{"password", "devices"})
 	var Exclude = bson.D{
 		{Key: "password", Value: 0},
 		{Key: "devices", Value: 0},
