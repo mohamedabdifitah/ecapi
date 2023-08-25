@@ -145,19 +145,19 @@ func (o *Order) PlaceOrder() (*mongo.InsertOneResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	res, err := OrderCollection.InsertOne(Ctx, &o)
-	if err != nil {
-		return nil, err
-	}
+	// res, err := OrderCollection.InsertOne(Ctx, &o)
+	// if err != nil {
+	// return nil, err
+	// }
 	// answer from https://www.mongodb.com/community/forums/t/insertone-returns-interface/131263/3
-	o.Id = res.InsertedID.(primitive.ObjectID)
+	// o.Id = res.InsertedID.(primitive.ObjectID)
 	json, err := json.Marshal(o)
 
 	if err != nil {
 		return nil, err
 	}
 	service.PublishTopic("new-order", json)
-	return res, nil
+	return nil, nil
 }
 func UpdateOrder(query bson.M, change bson.D) (*mongo.UpdateResult, error) {
 	res, err := OrderCollection.UpdateOne(Ctx, query, change)

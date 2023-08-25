@@ -32,6 +32,9 @@ func Initserver() {
 func InitRoutes(server *gin.Engine) {
 	path := server.RouterGroup
 	path.BasePath()
+	if os.Getenv("APP_ENV") == "development" {
+		path.Static("/static", "./doc")
+	}
 	CustomerRouter = path.Group("/customer")
 	DriverRouter = path.Group("/driver")
 	MerchantRouter = path.Group("/merchant")
