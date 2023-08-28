@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -37,9 +36,7 @@ func (m *Menu) Update() (*mongo.UpdateResult, error) {
 		{Key: "price", Value: m.Price},
 		{Key: "status", Value: m.Status},
 		{Key: "reciepe", Value: m.Reciepe},
-		{Key: "discount", Value: m.Discount},
 		{Key: "attributes", Value: m.Attributes},
-		{Key: "merchant_external_id", Value: m.MerchantExternalId},
 		{Key: "metadata.updated_at", Value: time.Now().UTC()},
 	}}}
 	result, err := MenuCollection.UpdateOne(Ctx, filter, update)
@@ -58,15 +55,6 @@ func (m *Menu) Delete() (*mongo.DeleteResult, error) {
 }
 func (m Menu) GetAll() ([]*Menu, error) {
 	var menus []*Menu
-	_ = bson.D{
-		{Key: "description", Value: m.Description},
-		{Key: "category", Value: m.Category},
-		{Key: "price", Value: m.Price},
-		{Key: "status", Value: m.Status},
-		{Key: "reciepe", Value: m.Reciepe},
-		{Key: "discount", Value: m.Discount},
-		// {Key: "attributes", Value: m.Attributes},
-	}
 	cursor, err := MenuCollection.Find(Ctx, bson.D{})
 	if err != nil {
 		return nil, err
@@ -126,7 +114,6 @@ func (m Menu) GetFromMerchant() ([]*Menu, error) {
 }
 func (m Menu) SetImages() (*mongo.UpdateResult, error) {
 	query := bson.M{"_id": m.Id}
-	fmt.Println(m.Images)
 	change := bson.M{"$push": bson.M{"images": bson.M{"$each": m.Images}}}
 	result, err := MenuCollection.UpdateOne(Ctx, query, change)
 	if err != nil {

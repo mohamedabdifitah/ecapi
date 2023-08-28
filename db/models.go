@@ -24,11 +24,10 @@ type Menu struct {
 	Price              uint               `json:"price" bson:"price"`                        // the price of the product is represented as cents 99 = $0.99
 	Attributes         Attributes         `json:"attributes" bson:"attributes"`
 	Metadata           Metadata           `json:"metadata" bson:"metadata"`
-	Discount           uint               `json:"discount" bson:"discount"` // 10%
 	MerchantExternalId string             `json:"merchant_external_id" bson:"merchant_external_id"`
 	Reciepe            []string           `json:"reciepe" bson:"reciepe"`
 	Barcode            string             `json:"-" bson:"barcode"`                   // if this needed
-	EstimateTime       int                `json:"estimate_time" bson:"estimate_time"` // in seconds
+	EstimateTime       int                `json:"estimate_time" bson:"estimate_time"` // estimate of preparation and cooking time in seconds
 }
 type Metadata struct {
 	CreatedAt time.Time `json:"created_at" bson:"created_at"`
@@ -52,18 +51,19 @@ type Order struct {
 	DroOffLocation        Location           `json:"dropoff_location" bson:"dropoff_location"` // location cordinates. float([123.1312343,-37.2144343])
 	DropOffInstruction    string             `json:"dropoff_instructions" bson:"dropoff_instructions"`
 	Stage                 string             `json:"stage" bson:"stage"`                                     // pendding,accepted,preparing,ready,pickuped,deleivered,cancelled.
-	ActionIfUndeliverable string             `json:"action_if_undeliverable" bson:"action_if_undeliverable"` // return_to_pickup
+	ActionIfUndeliverable string             `json:"action_if_undeliverable" bson:"action_if_undeliverable"` // return_to_merchant // destroy
 	PickupAddress         string             `json:"pickup_address" bson:"pickup_address"`
 	PickUpExternalId      string             `bson:"pickup_external_id" json:"pickup_external_id"`
 	PickUpPhone           string             `bson:"pickup_phone" json:"pickup_phone"`
 	PickUpLocation        Location           `bson:"pickup_location" json:"pickup_location"`
 	PickupTime            time.Time          `bson:"pickup_time" json:"pickup_time"`
-	PickupTimeEstimated   int                `bson:"pickup_time_estimated" json:"pickup_time_estimated"` // seconds
+	PickupEstimatedTime   int                `bson:"pickup_estimated_time" json:"pickup_estimated_time"` // seconds
 	PickupReferenceTag    string             `json:"pickup_reference_tag" bson:"pickup_reference_tag"`
 	DriverPhone           string             `bson:"driver_phone" json:"driver_phone"`
 	DriverAllowedVehicles []string           `json:"driver_allowed_vehicles" bson:"driver_allowed_vehicles" ` // car , motorcycle , walking
 	DriverExternalId      string             `bson:"driver_external_id" json:"driver_external_id"`
 	Metadata              Metadata           `bson:"metadata" json:"metadata" bson:"metadata"`
+	CancelReason          string             `bson:"cancel_reason" json:"cancel_reason"`
 }
 
 type Customer struct {
@@ -101,6 +101,7 @@ type Driver struct {
 	Metadata    AccountMetadata    `json:"metadata" bson:"metadata"`
 	Profile     string             `json:"profile" bson:"profile"`
 	Device      Device             `json:"-" bson:"device"`
+	Rate        Rate               `json:"rate" bson:"rate"`
 }
 type Merchant struct {
 	Id                primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65
@@ -109,12 +110,15 @@ type Merchant struct {
 	BusinessPhone     string             `bson:"business_phone" json:"business_phone"`
 	Location          Location           `bson:"location" json:"location"`
 	Address           string             `bson:"address" json:"address"`
-	TimeOperatorStart int                `bson:"time_operation_start" json:"time_operation_start"` // 0710 => 07:19 UTC
+	TimeOperatorStart int                `bson:"time_operation_start" json:"time_operation_start"` // 710 => 07:19 UTC
 	TimeOperatorEnd   int                `bson:"time_operation_end" json:"time_operation_end"`     // 2320 => 23:30 UTC
 	Metadata          AccountMetadata    `bson:"metadata" json:"metadata"`
 	Password          string             `json:"-" bson:"password"`
 	Profile           string             `json:"profile" bson:"profile"`
 	Device            Device             `json:"-" bson:"device"`
+	Category          string             `json:"category" bson:"category"` // fast food , drinks , resturant or
+	Rate              Rate               `json:"rate" bson:"rate"`
+	// Discount          uint               `json:"discount" bson:"discount"` // 20% discount up to 5
 }
 type Review struct {
 	Id         primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65
@@ -142,4 +146,12 @@ type Device struct {
 type Location struct {
 	Type        string    `bson:"type" json:"type"`
 	Coordinates []float64 `bson:"coordinates" json:"coordinates"`
+}
+type Rate struct {
+	Rate         float64 `bson:"rate" json:"rate"`
+	Participants uint    `bson:"participants" json:"participants"`
+}
+type Badge struct {
+	Title       string `bson:"title" json:"title"`
+	Description string `bson:"description" json:"description"`
 }

@@ -10,7 +10,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-// Reads The Acces Token => expires  then Searches Role
+// Reads The Acces Token and Refresh Token and authorize the roles also authorize the header of ssid of user id
 // Reads the refresh token checks the token_v validity generets access token => returns to header => to retry the request
 func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 	return func(c *gin.Context) {

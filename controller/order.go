@@ -51,6 +51,7 @@ func PlaceOrder(c *gin.Context) {
 		_, err = primitive.ObjectIDFromHex(item.ItemExternalId)
 		if err != nil {
 			c.String(400, err.Error())
+			return
 		}
 		items = append(items, db.Item{
 			Quantity:       item.Quantity,
@@ -60,10 +61,12 @@ func PlaceOrder(c *gin.Context) {
 	_, err = primitive.ObjectIDFromHex(body.PickUpExternalId)
 	if err != nil {
 		c.String(400, err.Error())
+		return
 	}
 	_, err = primitive.ObjectIDFromHex(body.DropOffExteranlId)
 	if err != nil {
 		c.String(400, err.Error())
+		return
 	}
 	order := db.Order{
 		Items:              items,
@@ -79,9 +82,13 @@ func PlaceOrder(c *gin.Context) {
 		PickUpExternalId:   body.PickUpExternalId,
 		Type:               body.Type,
 	}
-	res, err := order.PlaceOrder()
-	if err != nil {
-		c.String(400, err.Error())
+	res, errres := order.PlaceOrder()
+	if errres != nil {
+		if errres.Type == "string" {
+			c.String(errres.Status, errres.Message.Error())
+			return
+		}
+		c.JSON(errres.Status, errres.Message)
 		return
 	}
 	c.JSON(201, res)
@@ -214,6 +221,49 @@ func AccpetOrderByDriver(c *gin.Context) {
 			return
 		}
 		c.JSON(erres.Status, erres.Message.Error())
+		return
+	}
+	c.JSON(200, res)
+}
+func CancelOrder(c *gin.Context) {
+	OrderId := c.Param("id")
+	var customerid string = c.GetHeader("ssid")
+	objectid, err := primitive.ObjectIDFromHex(OrderId)
+	if err != nil {
+		c.String(400, "invalid Order Id")
+		return
+	}
+	query := bson.M{"_id": objectid, "dropoff_external_id": customerid}
+	change := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "metadata.update_at", Value: time.Now()},
+		{Key: "stage", Value: "cancel"},
+		{Key: "cancel_reason", Value: ""},
+	}}}
+	res, err := db.AccpetOrderBy(query, change, "order_canceled")
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	c.JSON(200, res)
+}
+func RejectOrderByMerchant(c *gin.Context) {
+	OrderId := c.Param("id")
+	var merchantid string = c.GetHeader("ssid")
+	var reason string
+	objectid, err := primitive.ObjectIDFromHex(OrderId)
+	if err != nil {
+		c.String(400, "invalid Order Id")
+		return
+	}
+	query := bson.M{"_id": objectid, "pickup_external_id": merchantid}
+	change := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "metadata.update_at", Value: time.Now()},
+		{Key: "stage", Value: "cancel"},
+		{Key: "cancel_reason", Value: ""},
+	}}}
+	res, err := db.CancelOrder(query, change, "order_canceled", reason)
+	if err != nil {
+		c.String(400, err.Error())
 		return
 	}
 	c.JSON(200, res)

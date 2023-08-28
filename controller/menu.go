@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
@@ -61,12 +59,13 @@ func GetMenu(c *gin.Context) {
 	c.JSON(200, menu)
 }
 func CreateMenu(c *gin.Context) {
-	var body *CreateMenuBody
+	var body *MenuBody
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
 		c.String(400, err.Error())
 		return
 	}
+	var merchantid string = c.GetHeader("ssid")
 	menu := &db.Menu{
 		Title:              body.Title,
 		Description:        body.Description,
@@ -74,10 +73,10 @@ func CreateMenu(c *gin.Context) {
 		Category:           body.Category,
 		Price:              body.Price,
 		Attributes:         body.Attributes,
-		MerchantExternalId: body.MerchantExternalId,
+		MerchantExternalId: merchantid,
 		Reciepe:            body.Reciepe,
-		Barcode:            body.Barcode,
-		Discount:           body.Discount,
+		EstimateTime:       body.EstimateTime,
+		Images:             []string{},
 	}
 	res, err := menu.Create()
 	if err != nil {
@@ -100,16 +99,15 @@ func UpdateMenu(c *gin.Context) {
 		return
 	}
 	menu := &db.Menu{
-		Id:                 objecId,
-		Title:              body.Title,
-		Description:        body.Description,
-		Category:           body.Category,
-		Reciepe:            body.Reciepe,
-		MerchantExternalId: body.MerchantExternalId,
-		Price:              body.Price,
-		Discount:           body.Discount,
-		Status:             body.Status,
-		Attributes:         body.Attributes,
+		Id:           objecId,
+		Title:        body.Title,
+		Description:  body.Description,
+		Category:     body.Category,
+		Reciepe:      body.Reciepe,
+		Price:        body.Price,
+		Status:       body.Status,
+		Attributes:   body.Attributes,
+		EstimateTime: body.EstimateTime,
 	}
 	res, err := menu.Update()
 	if err != nil {
@@ -156,34 +154,6 @@ func GetMenuFromMerchant(c *gin.Context) {
 	}
 	c.JSON(200, menues)
 }
-func PutImageMenues(c *gin.Context) {
-	// Multipart form
-	id := c.Param("id")
-	objecid, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		c.String(400, err.Error())
-		return
-	}
-	file, err := c.FormFile("upload")
-	if err != nil {
-		c.String(400, err.Error())
-		return
-	}
-	log.Println(file.Filename)
-
-	// Upload the file to specific dst.
-	c.SaveUploadedFile(file, fmt.Sprintf("%s/%s", os.Getenv("STATIC_URL"), file.Filename))
-	menu := db.Menu{
-		Id:     objecid,
-		Images: []string{fmt.Sprintf("%s/%s", os.Getenv("STATIC_URL"), file.Filename)},
-	}
-	res, err := menu.SetImages()
-	if err != nil {
-		c.String(500, err.Error())
-		return
-	}
-	c.JSON(200, res)
-}
 func AddMenuImages(c *gin.Context) {
 	id := c.Param("id")
 	objectid, err := primitive.ObjectIDFromHex(id)
@@ -191,7 +161,11 @@ func AddMenuImages(c *gin.Context) {
 		c.String(400, err.Error())
 		return
 	}
-	form, _ := c.MultipartForm()
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
 	files := form.File["photos"]
 	res, errres := utils.UploadPhotos(files)
 	if errres != nil {
@@ -211,6 +185,7 @@ func AddMenuImages(c *gin.Context) {
 		c.String(500, "error unmarshalling photos , please try again")
 		return
 	}
+	fmt.Println(photosUri)
 	menu := db.Menu{
 		Id:     objectid,
 		Images: photosUri,

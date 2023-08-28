@@ -23,7 +23,7 @@ func InitRedisClient() {
 }
 func PublishTopic(topic string, payload interface{}) error {
 	if err := RedisClient.Publish(Ctx, topic, payload).Err(); err != nil {
-		panic(err)
+		return err
 		// return err
 	}
 	return nil

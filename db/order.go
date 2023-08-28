@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/mohamedabdifitah/ecapi/service"
+	"github.com/mohamedabdifitah/ecapi/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -76,32 +77,30 @@ func (o *Order) GetByLocation(location []float64, maxdist int64, mindist int64) 
 	cursor.Close(Ctx)
 	return orders, nil
 }
-func (o *Order) ExtractItems() error {
+func (o *Order) ExtractItems() *ErrorResponse {
 	oids := make([]primitive.ObjectID, len(o.Items))
-	for i := range o.Items {
-		ids, err := primitive.ObjectIDFromHex(o.Items[i].ItemExternalId)
+	for i, item := range o.Items {
+		ids, err := primitive.ObjectIDFromHex(item.ItemExternalId)
 		if err != nil {
-			return err
+			return &ErrorResponse{Status: 400, Message: fmt.Errorf("Invalid Object ID of item %s", item.ItemExternalId), Type: "string"}
 		}
 		oids[i] = ids
 	}
+	// get all items from the collection of menu
 	menus, err := GetListMenus(oids)
 	if err != nil {
-		return err
+		return DBErrorHandler(err)
 	}
-	if menus == nil {
-		return fmt.Errorf("no menus found")
+	if menus == nil && len(menus) == 0 {
+		return &ErrorResponse{Status: 400, Message: fmt.Errorf("no menus found"), Type: "string"}
 	}
-	if len(menus) == 0 {
-		return fmt.Errorf("no menus found")
-	}
+
 	if len(menus) != len(o.Items) {
-		return fmt.Errorf("some items must be not available")
+		return &ErrorResponse{Status: 400, Message: fmt.Errorf("some items must be not available"), Type: "string"}
 	}
 	for i, menu := range menus {
 		o.Items[i].Price = menu.Price * o.Items[i].Quantity
-		o.PickupTimeEstimated = o.PickupTimeEstimated + menu.EstimateTime
-
+		o.PickupEstimatedTime = o.PickupEstimatedTime + menu.EstimateTime
 	}
 	return nil
 }
@@ -110,54 +109,62 @@ func (o *Order) CalculatePrice() {
 		o.OrderValue = o.OrderValue + order.Price
 	}
 }
-func (o *Order) BeforeSave() error {
+func (o *Order) BeforeSave() *ErrorResponse {
 	o.Stage = "placed"
 	o.Metadata.CreatedAt = time.Now().UTC()
 	err := o.ExtractItems()
 	if err != nil {
-		// fmt.Println(err.Error())
 		return err
 	}
 	o.CalculatePrice()
-	err = o.PickuPExtract()
-	if err != nil {
-		return err
+	erres := o.PickuPExtract()
+	if erres != nil {
+		return erres
 	}
+	o.ActionIfUndeliverable = "RETURN_TO_MERCHANT"
 	return nil
 }
-func (o *Order) PickuPExtract() error {
+func (o *Order) PickuPExtract() *ErrorResponse {
 	objectid, err := primitive.ObjectIDFromHex(o.PickUpExternalId)
 	merchant := Merchant{
 		Id: objectid,
 	}
 	err = merchant.GetById()
 	if err != nil {
-		fmt.Println(err.Error())
-		return err
+	}
+	// 24 > 6 OR 24 < 20
+	ok := utils.IsTimeBetween(merchant.TimeOperatorStart, merchant.TimeOperatorEnd)
+	if !ok {
+		return &ErrorResponse{Status: 400, Message: fmt.Errorf("merchant is currently closed"), Type: "string"}
 	}
 	o.PickUpLocation = merchant.Location
 	o.PickupAddress = merchant.Address
 	o.PickUpPhone = merchant.BusinessPhone
 	return nil
 }
-func (o *Order) PlaceOrder() (*mongo.InsertOneResult, error) {
-	err := o.BeforeSave()
-	if err != nil {
-		return nil, err
+
+// places order
+func (o *Order) PlaceOrder() (*mongo.InsertOneResult, *ErrorResponse) {
+	errres := o.BeforeSave()
+	if errres != nil {
+		return nil, errres
 	}
-	// res, err := OrderCollection.InsertOne(Ctx, &o)
-	// if err != nil {
-	// return nil, err
-	// }
+	res, err := OrderCollection.InsertOne(Ctx, &o)
+	if err != nil {
+		return nil, DBErrorHandler(err)
+	}
 	// answer from https://www.mongodb.com/community/forums/t/insertone-returns-interface/131263/3
-	// o.Id = res.InsertedID.(primitive.ObjectID)
+	o.Id = res.InsertedID.(primitive.ObjectID)
 	json, err := json.Marshal(o)
 
 	if err != nil {
-		return nil, err
+		return nil, &ErrorResponse{Status: 400, Message: err, Type: "string"}
 	}
-	service.PublishTopic("new-order", json)
-	return nil, nil
+	err = service.PublishTopic("new-order", json)
+	if err != nil {
+		return nil, &ErrorResponse{Status: 500, Message: fmt.Errorf("server error , please try again"), Type: "string"}
+	}
+	return res, nil
 }
 func UpdateOrder(query bson.M, change bson.D) (*mongo.UpdateResult, error) {
 	res, err := OrderCollection.UpdateOne(Ctx, query, change)
@@ -172,6 +179,14 @@ func AccpetOrderBy(query bson.M, change bson.D, topic string) (*mongo.UpdateResu
 		return nil, err
 	}
 	service.PublishTopic(topic, topic)
+	return res, nil
+}
+func CancelOrder(query bson.M, change bson.D, topic string, reason string) (*mongo.UpdateResult, error) {
+	res, err := UpdateOrder(query, change)
+	if err != nil {
+		return nil, err
+	}
+	service.PublishTopic(topic, reason)
 	return res, nil
 }
 func AssignOrderToDriver(orderId primitive.ObjectID, driverId primitive.ObjectID) (*mongo.UpdateResult, *ErrorResponse) {

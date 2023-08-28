@@ -21,27 +21,27 @@ func IsDup(err error) bool {
 	}
 	return false
 }
-func DBErrorHandler(err error) ErrorResponse {
+func DBErrorHandler(err error) *ErrorResponse {
 	if mongo.IsTimeout(err) {
-		return ErrorResponse{
+		return &ErrorResponse{
 			Status:  503, // or even you can 408 which means request timeout
 			Message: fmt.Errorf("Request took too long to respond"),
 			Type:    "string",
 		}
 	}
 	if mongo.IsDuplicateKeyError(err) {
-		return ErrorResponse{
+		return &ErrorResponse{
 			Status:  409,
 			Message: err,
 		}
 	}
 	if mongo.IsNetworkError(err) {
-		return ErrorResponse{
+		return &ErrorResponse{
 			Status:  500,
 			Message: err,
 		}
 	}
-	return ErrorResponse{
+	return &ErrorResponse{
 		Status:  500,
 		Message: err,
 	}
