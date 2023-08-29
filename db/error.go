@@ -22,6 +22,7 @@ func IsDup(err error) bool {
 	return false
 }
 func DBErrorHandler(err error) *ErrorResponse {
+
 	if mongo.IsTimeout(err) {
 		return &ErrorResponse{
 			Status:  503, // or even you can 408 which means request timeout
@@ -39,6 +40,26 @@ func DBErrorHandler(err error) *ErrorResponse {
 		return &ErrorResponse{
 			Status:  500,
 			Message: err,
+		}
+	}
+	var e mongo.WriteException
+	if errors.As(err, &e) {
+		for _, we := range e.WriteErrors {
+			switch we.Code {
+			// duplicate filed
+			case 11000:
+				return &ErrorResponse{
+					Status:  409,
+					Message: err,
+				}
+			// Can't extract geo keys
+			case 16755:
+				return &ErrorResponse{
+					Status:  400,
+					Message: err,
+				}
+
+			}
 		}
 	}
 	return &ErrorResponse{

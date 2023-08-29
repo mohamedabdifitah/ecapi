@@ -44,19 +44,29 @@ func SignUpMerchantWithPhone(c *gin.Context) {
 	var body *SignUpMerchantWithPhoneBody
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
-		c.JSON(400, err)
+		c.String(400, err.Error())
 		return
 	}
 	merchant := db.Merchant{
 		BusinessPhone: body.BusinessPhone,
 		Password:      body.Password,
+		BusinessName:  body.BusinessName,
+		Location: db.Location{
+			Type:        "Point",
+			Coordinates: body.Location,
+		},
 		Metadata: db.AccountMetadata{
 			Provider: "phone",
 		},
 	}
-	res, err := merchant.Save()
-	if err != nil {
-		c.JSON(500, err.Error())
+	res, erres := merchant.Save()
+	if erres != nil {
+		if erres.Type == "string" {
+			c.String(erres.Status, erres.Message.Error())
+			return
+		}
+		c.JSON(erres.Status, erres.Message)
+		// c.JSON(500, err.Error())
 		return
 	}
 	c.JSON(201, res)
@@ -85,6 +95,7 @@ func UpdateMerchant(c *gin.Context) {
 		BusinessEmail:     body.BusinessEmail,
 		TimeOperatorStart: body.TimeOperationStart,
 		TimeOperatorEnd:   body.TimeOperationEnd,
+		Category:          body.Category,
 	}
 	res, err := merchant.Update()
 	if err != nil {
@@ -212,7 +223,9 @@ func GetMerchantByLocation(c *gin.Context) {
 }
 func ChangeMerchantDevice(c *gin.Context) {
 	id := c.Param("id")
-	var body map[string]interface{}
+	var body struct {
+		Device db.Device `json:"device" binding:"required"`
+	}
 	objectid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.String(400, "Invalid id")
@@ -228,7 +241,7 @@ func ChangeMerchantDevice(c *gin.Context) {
 	}
 	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "metadata.update_at", Value: time.Now()},
-		{Key: "device", Value: body["device"]},
+		{Key: "device", Value: body.Device},
 	}}}
 	res, err := db.UpdateMerchant(query, update)
 	if err != nil {

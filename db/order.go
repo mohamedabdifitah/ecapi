@@ -181,12 +181,12 @@ func AccpetOrderBy(query bson.M, change bson.D, topic string) (*mongo.UpdateResu
 	service.PublishTopic(topic, topic)
 	return res, nil
 }
-func CancelOrder(query bson.M, change bson.D, topic string, reason string) (*mongo.UpdateResult, error) {
+func CancelOrder(query bson.M, change bson.D, topic string, info interface{}) (*mongo.UpdateResult, error) {
 	res, err := UpdateOrder(query, change)
 	if err != nil {
 		return nil, err
 	}
-	service.PublishTopic(topic, reason)
+	service.PublishTopic(topic, info)
 	return res, nil
 }
 func AssignOrderToDriver(orderId primitive.ObjectID, driverId primitive.ObjectID) (*mongo.UpdateResult, *ErrorResponse) {

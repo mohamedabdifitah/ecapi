@@ -249,7 +249,7 @@ func CancelOrder(c *gin.Context) {
 func RejectOrderByMerchant(c *gin.Context) {
 	OrderId := c.Param("id")
 	var merchantid string = c.GetHeader("ssid")
-	var reason string
+	var reason string = "CANCEL_FROM_MERCHANT"
 	objectid, err := primitive.ObjectIDFromHex(OrderId)
 	if err != nil {
 		c.String(400, "invalid Order Id")
@@ -259,9 +259,13 @@ func RejectOrderByMerchant(c *gin.Context) {
 	change := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "metadata.update_at", Value: time.Now()},
 		{Key: "stage", Value: "cancel"},
-		{Key: "cancel_reason", Value: ""},
+		{Key: "cancel_reason", Value: reason},
 	}}}
-	res, err := db.CancelOrder(query, change, "order_canceled", reason)
+	var info map[string]interface{}
+	info["id"] = objectid
+	info["cancel_reason"] = reason
+	info["merchant_id"] = merchantid
+	res, err := db.CancelOrder(query, change, "order_canceled", info)
 	if err != nil {
 		c.String(400, err.Error())
 		return

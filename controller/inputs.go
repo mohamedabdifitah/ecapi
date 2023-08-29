@@ -30,8 +30,10 @@ type EmailLoginBody struct {
 	Kind     string `json:"kind"`
 }
 type SignUpMerchantWithPhoneBody struct {
-	BusinessPhone string `json:"business_phone"`
-	Password      string `json:"password"`
+	BusinessPhone string    `json:"business_phone" binding:"required"`
+	BusinessName  string    `json:"business_name" binding:"required"`
+	Password      string    `json:"password" binding:"required"`
+	Location      []float64 `json:"location" binding:"required"`
 }
 type MerchantBody struct {
 	Location           []float64 `json:"location"`
@@ -40,6 +42,7 @@ type MerchantBody struct {
 	TimeOperationStart int       `json:"time_operation_start"`
 	TimeOperationEnd   int       `json:"time_operation_end"`
 	BusinessName       string    `json:"business_name"`
+	Category           []string  `json:"category"`
 }
 type ChangePhonedBody struct {
 	NewPhone string `json:"new_phone"`

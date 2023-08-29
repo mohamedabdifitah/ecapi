@@ -1,12 +1,14 @@
 package middleware
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/mohamedabdifitah/ecapi/db"
 	"github.com/mohamedabdifitah/ecapi/utils"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/exp/slices"
 )
 
@@ -15,7 +17,14 @@ import (
 func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenHeader := c.GetHeader("Authorization")
+		ReftokenHeader := c.GetHeader("refresh_token") // refresh token header t_v
 		id := c.GetHeader("ssid")
+		objectId, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			c.String(401, "invalid id")
+			c.Abort()
+			return
+		}
 		if tokenHeader == "" && len(strings.Split(tokenHeader, " ")) < 2 {
 			c.String(401, "authorization key not found")
 			c.Abort()
@@ -24,11 +33,67 @@ func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 		tokenString := strings.Split(tokenHeader, " ")[1]
 		token, err := utils.VerifyAccessToken(tokenString)
 		if err != nil {
-			c.String(401, err.Error())
-			c.Abort()
-			return
+			if errors.Is(err, jwt.ErrTokenExpired) {
+				reftokenString := strings.Split(ReftokenHeader, " ")[1]
+				reftoken, err := utils.VerifyRefereshToken(reftokenString)
+				if errors.Is(err, jwt.ErrTokenExpired) {
+					c.String(401, "token expired , login again.")
+					c.Abort()
+					return
+
+				}
+				switch token.Role {
+				case "customer":
+					customer := db.Customer{
+						Id: objectId,
+					}
+					customer.GetById()
+					if reftoken.TokenVersion != customer.Metadata.TokenVersion {
+						c.String(403, "Access Denied , please login again")
+						c.Abort()
+						return
+					}
+					tokenString, err = utils.GenerateAccessToken(customer.Email, customer.Id, db.Roles[0])
+					if err != nil {
+						c.String(401, "Error generating access token")
+						c.Abort()
+						return
+					}
+					token, err = utils.VerifyAccessToken(tokenString)
+					break
+				case "merchant":
+					merchant := db.Merchant{
+						Id: objectId,
+					}
+					merchant.GetById()
+					if reftoken.TokenVersion != merchant.Metadata.TokenVersion {
+						c.String(403, "Access Denied , please login again")
+						c.Abort()
+						return
+					}
+					tokenString, err = utils.GenerateAccessToken(merchant.BusinessPhone, merchant.Id, db.Roles[2])
+					if err != nil {
+						c.String(401, "Error generating access token")
+						c.Abort()
+						return
+					}
+					token, err = utils.VerifyAccessToken(tokenString)
+					if err != nil {
+						c.String(401, err.Error())
+						c.Abort()
+						return
+					}
+					c.Header("Authorization", "Bearer "+tokenString)
+					return
+					// break
+				}
+			} else {
+				c.String(401, err.Error())
+				c.Abort()
+				return
+
+			}
 		}
-		fmt.Println(token.Id)
 		if id != token.Id {
 			c.String(403, "Authentication Error")
 			c.Abort()
@@ -48,6 +113,9 @@ func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 			return
 		}
 	}
+}
+func Authenticate(token string) {
+
 }
 func TokenErrorHandler(c *gin.Context, err error) {
 

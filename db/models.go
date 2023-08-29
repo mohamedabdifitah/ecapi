@@ -116,7 +116,7 @@ type Merchant struct {
 	Password          string             `json:"-" bson:"password"`
 	Profile           string             `json:"profile" bson:"profile"`
 	Device            Device             `json:"-" bson:"device"`
-	Category          string             `json:"category" bson:"category"` // fast food , drinks , resturant or
+	Category          []string           `json:"category" bson:"category"` // fast food , drinks , resturant or
 	Rate              Rate               `json:"rate" bson:"rate"`
 	// Discount          uint               `json:"discount" bson:"discount"` // 20% discount up to 5
 }

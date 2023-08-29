@@ -21,16 +21,15 @@ func (m *Merchant) BeforeSave() error {
 	m.Metadata.UpdatedAt = time.Now().UTC()
 	return nil
 }
-func (m *Merchant) Save() (*mongo.InsertOneResult, error) {
+func (m *Merchant) Save() (*mongo.InsertOneResult, *ErrorResponse) {
 	err := m.BeforeSave()
 	if err != nil {
-		return nil, err
+		return nil, &ErrorResponse{Status: 400, Message: err, Type: "string"}
 	}
 	res, err := MerchantCollection.InsertOne(Ctx, &m)
 	if err != nil {
-		return nil, err
+		return nil, DBErrorHandler(err)
 	}
-	// res.Decode(&m)
 	return res, nil
 }
 func (m *Merchant) GetById() error {
@@ -78,6 +77,7 @@ func (m *Merchant) Update() (*mongo.UpdateResult, error) {
 		{Key: "time_operation_end", Value: m.TimeOperatorEnd},
 		{Key: "business_email", Value: m.BusinessEmail},
 		{Key: "address", Value: m.Address},
+		{Key: "category", Value: m.Category},
 		{Key: "metadata.updated_at", Value: time.Now().UTC()},
 	}}}
 
