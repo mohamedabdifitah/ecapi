@@ -261,7 +261,7 @@ func RejectOrderByMerchant(c *gin.Context) {
 		{Key: "stage", Value: "cancel"},
 		{Key: "cancel_reason", Value: reason},
 	}}}
-	var info map[string]interface{}
+	info := make(map[string]interface{})
 	info["id"] = objectid
 	info["cancel_reason"] = reason
 	info["merchant_id"] = merchantid

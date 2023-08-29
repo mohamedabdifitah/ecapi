@@ -34,6 +34,11 @@ func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 		token, err := utils.VerifyAccessToken(tokenString)
 		if err != nil {
 			if errors.Is(err, jwt.ErrTokenExpired) {
+				if ReftokenHeader == "" && len(strings.Split(ReftokenHeader, " ")) < 2 {
+					c.String(401, "authorization key not found")
+					c.Abort()
+					return
+				}
 				reftokenString := strings.Split(ReftokenHeader, " ")[1]
 				reftoken, err := utils.VerifyRefereshToken(reftokenString)
 				if errors.Is(err, jwt.ErrTokenExpired) {
@@ -47,7 +52,12 @@ func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 					customer := db.Customer{
 						Id: objectId,
 					}
-					customer.GetById()
+					err = customer.GetById()
+					if err != nil {
+						c.String(401, "user not found")
+						c.Abort()
+						return
+					}
 					if reftoken.TokenVersion != customer.Metadata.TokenVersion {
 						c.String(403, "Access Denied , please login again")
 						c.Abort()
@@ -60,12 +70,23 @@ func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 						return
 					}
 					token, err = utils.VerifyAccessToken(tokenString)
-					break
+					if err != nil {
+						c.String(401, err.Error())
+						c.Abort()
+						return
+					}
+					c.Header("Authorization", "Bearer "+tokenString)
+					return
 				case "merchant":
 					merchant := db.Merchant{
 						Id: objectId,
 					}
-					merchant.GetById()
+					err = merchant.GetById()
+					if err != nil {
+						c.String(401, "user not found")
+						c.Abort()
+						return
+					}
 					if reftoken.TokenVersion != merchant.Metadata.TokenVersion {
 						c.String(403, "Access Denied , please login again")
 						c.Abort()
@@ -111,7 +132,9 @@ func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 			c.String(403, "Access Denied")
 			c.Abort()
 			return
+
 		}
+
 	}
 }
 func Authenticate(token string) {
