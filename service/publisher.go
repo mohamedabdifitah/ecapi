@@ -20,9 +20,8 @@ func InitRedisClient() {
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
-	if err := RedisClient.Ping(Ctx); err != nil {
+	if err := RedisClient.Ping(Ctx).Err(); err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 	fmt.Println("redis connection established")
 }
