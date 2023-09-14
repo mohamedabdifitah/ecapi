@@ -14,7 +14,7 @@ func RouterDefinition() {
 	OrderRouterDefinition()
 }
 func CustomerRouteDefinition() {
-	CustomerRouter.GET("/all", middleware.AuthorizeRolesMiddleware([]string{"admin", "manager"}), controller.GetAllCustomers)
+	CustomerRouter.GET("/all", middleware.AuthorizeRolesMiddleware([]string{}), controller.GetAllCustomers)
 	CustomerRouter.GET("/get/:id", middleware.AuthorizeRolesMiddleware([]string{}), controller.GetCustomer)
 	CustomerRouter.PUT("/update/:id", controller.UpdateCustomer)
 	CustomerRouter.PATCH("/change/password/:id", controller.ChangeCustomerPassword)
