@@ -54,6 +54,7 @@ type Order struct {
 	ActionIfUndeliverable string             `json:"action_if_undeliverable" bson:"action_if_undeliverable"` // return_to_merchant // destroy
 	PickupAddress         string             `json:"pickup_address" bson:"pickup_address"`
 	PickUpExternalId      string             `bson:"pickup_external_id" json:"pickup_external_id"`
+	PickUpName            string             `bson:"pickup_name" json:"pickup_name"`
 	PickUpPhone           string             `bson:"pickup_phone" json:"pickup_phone"`
 	PickUpLocation        Location           `bson:"pickup_location" json:"pickup_location"`
 	PickupTime            time.Time          `bson:"pickup_time" json:"pickup_time"`

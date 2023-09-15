@@ -163,7 +163,8 @@ func MerchantOrderAccept(c *gin.Context) {
 		c.String(400, "invalid Order Id")
 		return
 	}
-	query := bson.M{"_id": objectid, "pickup_external_id": merchantid}
+	// is order already accepted
+	query := bson.M{"_id": objectid, "pickup_external_id": merchantid, "stage": "placed"}
 	change := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "metadata.update_at", Value: time.Now()},
 		{Key: "stage", Value: "accepted"},
