@@ -9,7 +9,10 @@ import (
 	"github.com/mohamedabdifitah/ecapi/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/exp/slices"
 )
+
+var CancelReason = []string{"CANCEL_FROM_MERCHANT", "CANCEL_FROM_CUSTOMER", "CANCEL_FROM_ADMIN"}
 
 func GetOrderByid(c *gin.Context) {
 	var id string = c.Param("id")
@@ -163,13 +166,32 @@ func MerchantOrderAccept(c *gin.Context) {
 		c.String(400, "invalid Order Id")
 		return
 	}
-	// is order already accepted
-	query := bson.M{"_id": objectid, "pickup_external_id": merchantid, "stage": "placed"}
+	query := bson.D{
+		{
+			Key:   "_id",
+			Value: objectid,
+		},
+		{
+			Key:   "pickup_external_id",
+			Value: merchantid,
+		},
+	}
+	order, err := db.GetOrderBy(query)
+	if err != nil {
+		c.String(400, "order is not found")
+		return
+	}
+	if order.Stage != "placed" {
+		c.String(400, "order is already accepted")
+		return
+	}
+	order.Stage = "accepted"
+	filter := bson.M{"_id": order.Id}
 	change := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "metadata.update_at", Value: time.Now()},
 		{Key: "stage", Value: "accepted"},
 	}}}
-	res, err := db.AccpetOrderBy(query, change, "merchant-accpted")
+	res, err := db.ChangeOrder(filter, change, "merchant-accpted", order)
 	if err != nil {
 		c.String(400, err.Error())
 		return
@@ -234,13 +256,46 @@ func CancelOrder(c *gin.Context) {
 		c.String(400, "invalid Order Id")
 		return
 	}
-	query := bson.M{"_id": objectid, "dropoff_external_id": customerid}
+	var body map[string]string = make(map[string]string)
+	err = c.ShouldBindJSON(&body)
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	reason, ok := body["reason"]
+	if !ok {
+		c.String(400, "there is no reason")
+		return
+	}
+	query := bson.D{
+		{
+			Key:   "_id",
+			Value: objectid,
+		},
+		{
+			Key:   "dropoff_external_id",
+			Value: customerid,
+		},
+	}
+	order, err := db.GetOrderBy(query)
+	if err != nil {
+		c.String(400, "order is not found")
+		return
+	}
+	if slices.Contains([]string{"accepted", "placed"}, order.Stage) {
+
+	}
+	filter := bson.M{"_id": objectid, "dropoff_external_id": customerid}
 	change := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "metadata.update_at", Value: time.Now()},
 		{Key: "stage", Value: "cancel"},
-		{Key: "cancel_reason", Value: ""},
+		{Key: "cancel_reason", Value: CancelReason[1] + " " + reason},
 	}}}
-	res, err := db.AccpetOrderBy(query, change, "order_canceled")
+	info := make(map[string]interface{})
+	info["id"] = objectid
+	info["cancel_reason"] = CancelReason[1] + " " + reason
+	info["customer_id"] = customerid
+	res, err := db.ChangeOrder(filter, change, "order_canceled", info)
 	if err != nil {
 		c.String(400, err.Error())
 		return
@@ -250,23 +305,56 @@ func CancelOrder(c *gin.Context) {
 func RejectOrderByMerchant(c *gin.Context) {
 	OrderId := c.Param("id")
 	var merchantid string = c.GetHeader("ssid")
-	var reason string = "CANCEL_FROM_MERCHANT"
+	var body map[string]string = make(map[string]string)
+	err := c.ShouldBindJSON(&body)
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	reason, ok := body["reason"]
+	if !ok {
+		c.String(400, "there is no reason")
+		return
+	}
 	objectid, err := primitive.ObjectIDFromHex(OrderId)
 	if err != nil {
 		c.String(400, "invalid Order Id")
 		return
 	}
-	query := bson.M{"_id": objectid, "pickup_external_id": merchantid}
+	query := bson.D{
+		{
+			Key:   "_id",
+			Value: objectid,
+		},
+		{
+			Key:   "pickup_external_id",
+			Value: merchantid,
+		},
+	}
+	order, err := db.GetOrderBy(query)
+	if err != nil {
+		c.String(400, "order is not found")
+		return
+	}
+	if order.Stage == "canceled" {
+		c.String(400, "order is already canceled")
+		return
+	}
+	if slices.Contains([]string{"pickuped", "deleivered"}, order.Stage) {
+		c.String(400, "can't cancel order because it's already picked or delivered")
+		return
+	}
+	filter := bson.M{"_id": objectid, "pickup_external_id": merchantid}
 	change := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "metadata.update_at", Value: time.Now()},
 		{Key: "stage", Value: "cancel"},
-		{Key: "cancel_reason", Value: reason},
+		{Key: "cancel_reason", Value: CancelReason[0] + " " + reason},
 	}}}
 	info := make(map[string]interface{})
 	info["id"] = objectid
-	info["cancel_reason"] = reason
+	info["cancel_reason"] = CancelReason[0] + " " + reason
 	info["merchant_id"] = merchantid
-	res, err := db.CancelOrder(query, change, "order_canceled", info)
+	res, err := db.ChangeOrder(filter, change, "order_canceled", info)
 	if err != nil {
 		c.String(400, err.Error())
 		return

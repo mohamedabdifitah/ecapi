@@ -50,7 +50,7 @@ type Order struct {
 	DropOffAddress        string             `json:"dropoff_address" bson:"dropoff_address"`   // address 901 Market Street 6th Floor San Francisco, CA 94103
 	DroOffLocation        Location           `json:"dropoff_location" bson:"dropoff_location"` // location cordinates. float([123.1312343,-37.2144343])
 	DropOffInstruction    string             `json:"dropoff_instructions" bson:"dropoff_instructions"`
-	Stage                 string             `json:"stage" bson:"stage"`                                     // pendding,accepted,preparing,ready,pickuped,deleivered,cancelled.
+	Stage                 string             `json:"stage" bson:"stage"`                                     // placed,accepted,preparing,ready,pickuped,deleivered,cancelled.
 	ActionIfUndeliverable string             `json:"action_if_undeliverable" bson:"action_if_undeliverable"` // return_to_merchant // destroy
 	PickupAddress         string             `json:"pickup_address" bson:"pickup_address"`
 	PickUpExternalId      string             `bson:"pickup_external_id" json:"pickup_external_id"`
@@ -96,7 +96,7 @@ type Driver struct {
 	Email       string             `json:"email" bson:"email"`
 	Phone       string             `json:"phone" bson:"phone"`
 	GivenName   string             `json:"given_name" bson:"given_name"`
-	VehicleType string             `json:"vehicle_type" bson:"vehicle_type"`
+	VehicleType string             `json:"vehicle_type" bson:"vehicle_type"` // car , motorcycle
 	Age         primitive.DateTime `json:"age" bson:"age"`
 	Address     string             `json:"address" bson:"address"`
 	Metadata    AccountMetadata    `json:"metadata" bson:"metadata"`

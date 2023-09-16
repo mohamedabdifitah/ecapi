@@ -10,7 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	// "go.mongodb.org/mongo-driver/mongo"
 )
 
 func (o *Order) GetById() error {
@@ -18,6 +17,15 @@ func (o *Order) GetById() error {
 	result := OrderCollection.FindOne(Ctx, query)
 	err := result.Decode(&o)
 	return err
+}
+func GetOrderBy(query bson.D) (*Order, error) {
+	var order *Order
+	result := OrderCollection.FindOne(Ctx, query)
+	err := result.Decode(&order)
+	if err != nil {
+		return nil, err
+	}
+	return order, nil
 }
 func GetOrdersBy(filter bson.D) ([]*Order, error) {
 	var orders []*Order
@@ -175,20 +183,15 @@ func UpdateOrder(query bson.M, change bson.D) (*mongo.UpdateResult, error) {
 	}
 	return res, nil
 }
-func AccpetOrderBy(query bson.M, change bson.D, topic string) (*mongo.UpdateResult, error) {
+func ChangeOrder(query bson.M, change bson.D, topic string, message interface{}) (*mongo.UpdateResult, error) {
 	res, err := UpdateOrder(query, change)
 	if err != nil {
 		return nil, err
 	}
-	service.PublishTopic(topic, topic)
-	return res, nil
-}
-func CancelOrder(query bson.M, change bson.D, topic string, info interface{}) (*mongo.UpdateResult, error) {
-	res, err := UpdateOrder(query, change)
-	if err != nil {
-		return nil, err
+	if res.MatchedCount == 0 && res.ModifiedCount == 0 {
+		return nil, fmt.Errorf("order is not found")
 	}
-	service.PublishTopic(topic, info)
+	service.PublishTopic(topic, message)
 	return res, nil
 }
 func AssignOrderToDriver(orderId primitive.ObjectID, driverId primitive.ObjectID) (*mongo.UpdateResult, *ErrorResponse) {
@@ -197,10 +200,10 @@ func AssignOrderToDriver(orderId primitive.ObjectID, driverId primitive.ObjectID
 	}
 	err := order.GetById()
 	if err != nil {
-		return nil, &ErrorResponse{Message: err, Status: 400}
+		return nil, &ErrorResponse{Message: fmt.Errorf("order is not found"), Status: 400, Type: "string"}
 	}
 	if order.Stage == "canceled" {
-		return nil, &ErrorResponse{Message: fmt.Errorf("order is canceled"), Status: 403, Type: "string"}
+		return nil, &ErrorResponse{Message: fmt.Errorf("order is already canceled"), Status: 403, Type: "string"}
 	}
 	if order.DriverExternalId != "" && order.DriverPhone != "" {
 		return nil, &ErrorResponse{Message: fmt.Errorf("order already assigned to another driver"), Status: 409, Type: "string"}
@@ -210,7 +213,7 @@ func AssignOrderToDriver(orderId primitive.ObjectID, driverId primitive.ObjectID
 	}
 	err = driver.GetById()
 	if err != nil {
-		return nil, &ErrorResponse{Message: err, Status: 400}
+		return nil, &ErrorResponse{Message: fmt.Errorf("driver is not found"), Status: 400, Type: "string"}
 	}
 	query := bson.M{"_id": order.Id}
 	change := bson.D{{Key: "$set", Value: bson.D{
@@ -218,7 +221,7 @@ func AssignOrderToDriver(orderId primitive.ObjectID, driverId primitive.ObjectID
 		{Key: "driver_external_id", Value: driver.Id.Hex()},
 		{Key: "driver_phone", Value: driver.Phone},
 	}}}
-	res, err := AccpetOrderBy(query, change, "driver-accepted")
+	res, err := ChangeOrder(query, change, "driver-accepted", order)
 	if err != nil {
 		return nil, &ErrorResponse{Message: err, Status: 500}
 	}
