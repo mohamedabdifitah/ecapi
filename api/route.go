@@ -65,8 +65,9 @@ func MenuRouterDefinition() {
 
 func ReviewRouterDefinition() {
 	ReviewRouter.GET("/get/:id", controller.GetReviewById)
-	ReviewRouter.GET("/user/:id", controller.GetUserReview)
-	ReviewRouter.GET("/to/:type/:eid", controller.GetReviewToMe)
+	ReviewRouter.GET("/user/:id", controller.GetUserReviews)
+	ReviewRouter.GET("/to/merchant/:id", controller.GetReviewMerchant)
+	ReviewRouter.GET("/to/driver/:id", controller.GetReviewDriver)
 	ReviewRouter.GET("/all", controller.GetAllReview)
 	ReviewRouter.PUT("/update/:id", controller.UpdateReview)
 	ReviewRouter.POST("/create", controller.CreateReview)

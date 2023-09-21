@@ -5,28 +5,31 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func GetUserReview(c *gin.Context) {
+func GetUserReviews(c *gin.Context) {
 	id := c.Param("id")
-	review := db.Review{
-		From: id,
+	reviews, err := db.GetReviewsByUser(id)
+	if err != nil {
+		c.JSON(400, err)
 	}
-	reviews, err := review.GetByUser()
+	c.JSON(200, reviews)
+}
+func GetReviewMerchant(c *gin.Context) {
+	ExternalId := c.Param("id")
+	// bson.D{{"merchant_review.external_id", "64ea387416182c259943067b"}}
+	reviews, err := db.GetReviewsToInstance("merchant_review.external_id", ExternalId)
 	if err != nil {
 		c.JSON(500, err)
 	}
 	c.JSON(200, reviews)
+
 }
-func GetReviewToMe(c *gin.Context) {
-	Type := c.Param("type")
-	ExternalId := c.Param("eid")
-	review := db.Review{
-		ExternalId: ExternalId,
-		Type:       Type,
-	}
-	reviews, err := review.GetReviewsToMe()
+func GetReviewDriver(c *gin.Context) {
+	ExternalId := c.Param("id")
+	reviews, err := db.GetReviewsToInstance("driver_review.external_id", ExternalId)
 	if err != nil {
 		c.JSON(500, err)
 	}
@@ -34,8 +37,7 @@ func GetReviewToMe(c *gin.Context) {
 
 }
 func GetAllReview(c *gin.Context) {
-	review := db.Review{}
-	reviews, err := review.GetAll()
+	reviews, err := db.GetAllReviews(bson.D{})
 	if err != nil {
 		c.JSON(500, err)
 	}
@@ -49,11 +51,18 @@ func CreateReview(c *gin.Context) {
 		return
 	}
 	review := &db.Review{
-		Rate:       body.Rate,
-		From:       body.From,
-		Message:    body.Message,
-		Type:       body.Type,
-		ExternalId: body.ExternalId,
+		From: body.From,
+		MerchantReview: db.ReviewColl{
+			Rate:       body.MerchantReview.Rate,
+			Message:    body.MerchantReview.ExternalId,
+			ExternalId: body.MerchantReview.ExternalId,
+		},
+		OrderId: body.OrderId,
+		DriverReview: db.ReviewColl{
+			Rate:       body.DriverReview.Rate,
+			Message:    body.MerchantReview.ExternalId,
+			ExternalId: body.MerchantReview.ExternalId,
+		},
 	}
 	res, err := review.Create()
 	if err != nil {
@@ -97,9 +106,7 @@ func UpdateReview(c *gin.Context) {
 		return
 	}
 	review := &db.Review{
-		Id:      objecId,
-		Rate:    body.Rate,
-		Message: body.Message,
+		Id: objecId,
 	}
 	res, err := review.Update()
 	if err != nil {

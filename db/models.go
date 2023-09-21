@@ -122,13 +122,17 @@ type Merchant struct {
 	// Discount          uint               `json:"discount" bson:"discount"` // 20% discount up to 5
 }
 type Review struct {
-	Id         primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65
-	Rate       uint               `bson:"rate" json:"rate"`
-	Message    string             `bson:"message" json:"message"`
-	From       string             `bson:"from" json:"from"`
-	Type       string             `bson:"type" json:"type"` // REVIEW_MENU , REVIEW_DRIVER . REVIEW_MERCHANT
-	ExternalId string             `bson:"external_id" json:"external_id"`
-	Metadata   Metadata           `bson:"metadata" json:"metadata"`
+	Id             primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65
+	OrderId        string             `bson:"order_id" json:"order_id"`
+	MerchantReview ReviewColl         `bson:"merchant_review" json:"merchant_review"`
+	DriverReview   ReviewColl         `bson:"driver_review" json:"driver_review"`
+	From           string             `bson:"from" json:"from"`
+	Metadata       Metadata           `bson:"metadata" json:"metadata"`
+}
+type ReviewColl struct {
+	Message    string  `bson:"message" json:"message"`
+	Rate       float64 `bson:"rate" json:"rate"`
+	ExternalId string  `bson:"external_id" json:"external_id"`
 }
 type Coupon struct {
 	Token             string             `json:"token" bson:"token"`
@@ -150,6 +154,7 @@ type Location struct {
 }
 type Rate struct {
 	Rate         float64 `bson:"rate" json:"rate"`
+	ScoreStats   []int   `bson:"stats" json:"-"`
 	Participants uint    `bson:"participants" json:"participants"`
 }
 type Badge struct {

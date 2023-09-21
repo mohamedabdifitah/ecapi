@@ -68,6 +68,8 @@ func (m *Merchant) GetAll() ([]*Merchant, error) {
 	cursor.Close(Ctx)
 	return merchants, nil
 }
+
+// future Archive
 func (m *Merchant) Update() (*mongo.UpdateResult, error) {
 	filter := bson.M{"_id": m.Id}
 	update := bson.D{{Key: "$set", Value: bson.D{

@@ -42,11 +42,6 @@ func ConnectDB() {
 	if err != nil {
 		log.Fatal("error while trying to ping mongo", err)
 	}
-	// dbList, err := Mongoclient.ListDatabaseNames(Ctx, bson.D{})
-	// if err != nil {
-	// 	fmt.Println("error while trying to list database names", err)
-	// }
-	// fmt.Println(dbList)
 	fmt.Println("mongo connection established")
 	ResturantDB := Mongoclient.Database("resys")
 
@@ -63,7 +58,7 @@ func ConnectDB() {
 	CreateGeoIndex("location", MerchantCollection)
 	CreateGeoIndex("dropoff_location", OrderCollection)
 	CreateGeoIndex("pickup_location", OrderCollection)
-	// CreateIndex("barcode", MenuCollection)
+	CreateIndex("order_id", ReviewCollection)
 }
 func CloseDB() error {
 	// Ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)

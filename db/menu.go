@@ -15,8 +15,6 @@ func (m *Menu) GetById() error {
 	return err
 }
 
-// func (m *Menu) GetMerchantMenu() ([]*Menu , error) {
-// }
 func (m *Menu) Create() (*mongo.InsertOneResult, error) {
 	m.Metadata.CreatedAt = time.Now().UTC()
 	res, err := MenuCollection.InsertOne(Ctx, m)
@@ -39,6 +37,13 @@ func (m *Menu) Update() (*mongo.UpdateResult, error) {
 		{Key: "attributes", Value: m.Attributes},
 		{Key: "metadata.updated_at", Value: time.Now().UTC()},
 	}}}
+	result, err := MenuCollection.UpdateOne(Ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+func ChangeMenuField(filter bson.D, update bson.D) (*mongo.UpdateResult, error) {
 	result, err := MenuCollection.UpdateOne(Ctx, filter, update)
 	if err != nil {
 		return nil, err

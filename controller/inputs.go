@@ -74,11 +74,16 @@ type MenuBody struct {
 	EstimateTime int           `json:"estimate_time"`
 }
 type ReviewBody struct {
-	Rate       uint   `json:"rate"`
-	Message    string `json:"message"`
-	From       string `json:"from"`
-	Type       string `json:"type"`
-	ExternalId string `json:"external_id"`
+	OrderId        string             `json:"order_id"`
+	Rate           uint               `json:"rate"`
+	MerchantReview ReviewExternalBody `json:"merchant_review"`
+	DriverReview   ReviewExternalBody `json:"driver_review"`
+	From           string             `json:"from"`
+}
+type ReviewExternalBody struct {
+	Rate       float64 `json:"rate" binding:"gte=1"`
+	Message    string  `json:"message"`
+	ExternalId string  `json:"external_id"`
 }
 type PlaceOrderBody struct {
 	Items              []Item    `json:"items"`
