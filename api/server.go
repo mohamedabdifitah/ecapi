@@ -35,6 +35,7 @@ func InitRoutes(server *gin.Engine) {
 	if os.Getenv("APP_ENV") == "development" {
 		path.Static("/static", "./doc")
 	}
+	path.Static("/assets", "./assets")
 	CustomerRouter = path.Group("/customer")
 	DriverRouter = path.Group("/driver")
 	MerchantRouter = path.Group("/merchant")
