@@ -21,7 +21,7 @@ func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 		id := c.GetHeader("ssid")
 		objectId, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
-			c.String(401, "invalid id")
+			c.String(403, "not authorized , ssid not found")
 			c.Abort()
 			return
 		}

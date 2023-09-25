@@ -1,9 +1,6 @@
 package controller
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -167,33 +164,19 @@ func AddMenuImages(c *gin.Context) {
 		return
 	}
 	files := form.File["photos"]
-	res, errres := utils.UploadPhotos(files)
-	if errres != nil {
-		c.String(errres.StatusCode, errres.Reason.Error())
-		return
-	}
-	body := &bytes.Buffer{}
-	_, err = body.ReadFrom(res.Body)
+	response, ErrorResponse := utils.UploadFiles("", files...)
 	if err != nil {
-		c.String(500, "error uploading file, please try again")
+		c.String(ErrorResponse.StatusCode, ErrorResponse.Reason.Error())
 		return
 	}
-	res.Body.Close()
-	var photosUri []string
-	err = json.Unmarshal(body.Bytes(), &photosUri)
-	if err != nil {
-		c.String(500, "error unmarshalling photos , please try again")
-		return
-	}
-	fmt.Println(photosUri)
 	menu := db.Menu{
 		Id:     objectid,
-		Images: photosUri,
+		Images: response,
 	}
-	response, err := menu.SetImages()
+	confirm, err := menu.SetImages()
 	if err != nil {
 		c.String(500, err.Error())
 		return
 	}
-	c.JSON(200, response)
+	c.JSON(200, confirm)
 }

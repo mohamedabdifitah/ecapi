@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"bytes"
 	"net/http"
 	"time"
 
@@ -221,22 +220,15 @@ func ChangeCustomerProfile(c *gin.Context) {
 		c.String(400, err.Error())
 		return
 	}
-	response, ErrorResponse := utils.UploadFile(file)
+	response, ErrorResponse := utils.UploadFiles("", file)
 	if err != nil {
 		c.String(ErrorResponse.StatusCode, ErrorResponse.Reason.Error())
 		return
 	}
-	body := &bytes.Buffer{}
-	_, err = body.ReadFrom(response.Body)
-	if err != nil {
-		c.String(500, "error uploading file, please try again")
-		return
-	}
-	response.Body.Close()
 	query := bson.M{"_id": objectid}
 	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "metadata.update_at", Value: time.Now()},
-		{Key: "profile", Value: body.String()},
+		{Key: "profile", Value: response[0]},
 	}}}
 	confirm, err := db.UpdateCustomer(query, update)
 	if err != nil {

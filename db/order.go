@@ -142,7 +142,7 @@ func (o *Order) PickuPExtract() *ErrorResponse {
 		return &ErrorResponse{Status: 400, Message: fmt.Errorf("not found merchant"), Type: "string"}
 	}
 	// 24 > 6 OR 24 < 20
-	ok := utils.IsTimeBetween(merchant.TimeOperatorStart, merchant.TimeOperatorEnd)
+	ok := utils.IsTimeBetween(time.Now(), merchant.TimeOperatorStart, merchant.TimeOperatorEnd)
 	if !ok {
 		return &ErrorResponse{Status: 400, Message: fmt.Errorf("merchant is currently closed"), Type: "string"}
 	}

@@ -1,12 +1,12 @@
 package utils
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"mime/multipart"
-	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 type ErrorResonse struct {
@@ -14,72 +14,34 @@ type ErrorResonse struct {
 	Reason     error
 }
 
-func UploadFile(file *multipart.FileHeader) (*http.Response, *ErrorResonse) {
-	src, err := file.Open()
-	if err != nil {
-		return nil, &ErrorResonse{StatusCode: 400, Reason: fmt.Errorf("File could not be opened")}
+func UploadFiles(base string, files ...*multipart.FileHeader) ([]string, *ErrorResonse) {
+	if base == "" {
+		base = filepath.Base("/assets")
 	}
-	defer src.Close()
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreatePart(file.Header)
-	if err != nil {
-		return nil, &ErrorResonse{StatusCode: 500, Reason: fmt.Errorf("Error copying file , please try again")}
-	}
-	_, err = io.Copy(part, src)
-	if err != nil {
-		return nil, &ErrorResonse{StatusCode: 400, Reason: fmt.Errorf("this file is broken")}
-	}
-	err = writer.Close()
-	if err != nil {
-		return nil, &ErrorResonse{StatusCode: 500, Reason: fmt.Errorf("there is error , please try again")}
-	}
-	req, err := http.NewRequest("POST", os.Getenv("UPLOAD_URL"), body)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	if err != nil {
-		return nil, &ErrorResonse{StatusCode: 503, Reason: fmt.Errorf("there is error , please try again")}
-	}
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, &ErrorResonse{StatusCode: res.StatusCode, Reason: err}
-	}
-	return res, nil
-}
-
-func UploadPhotos(files []*multipart.FileHeader) (*http.Response, *ErrorResonse) {
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
+	var response []string
 	for _, file := range files {
 		src, err := file.Open()
 		if err != nil {
-			return nil, &ErrorResonse{StatusCode: 400, Reason: fmt.Errorf("File could not be opened")}
+			return response, &ErrorResonse{StatusCode: 400, Reason: fmt.Errorf("File could not be opened")}
 		}
 		defer src.Close()
-		part, err := writer.CreatePart(file.Header)
-		if err != nil {
-			return nil, &ErrorResonse{StatusCode: 500, Reason: fmt.Errorf("Error copying file , please try again")}
+		if err = os.MkdirAll(filepath.Dir(base), 0750); err != nil {
+			return response, &ErrorResonse{StatusCode: 500, Reason: err}
 		}
-		_, err = io.Copy(part, src)
+		var extension string = strings.Split(file.Filename, ".")[1]
+		var name string = base + "/" + "hello" + "." + extension
+		out, err := os.Create(name)
 		if err != nil {
-			return nil, &ErrorResonse{StatusCode: 400, Reason: fmt.Errorf("this file is broken")}
+			return response, &ErrorResonse{StatusCode: 500, Reason: err}
 		}
-		_, err = io.Copy(part, src)
+		defer out.Close()
+
+		_, err = io.Copy(out, src)
 		if err != nil {
-			return nil, &ErrorResonse{StatusCode: 400, Reason: fmt.Errorf("this file is broken")}
+			return response, &ErrorResonse{StatusCode: 500, Reason: err}
 		}
+		response = append(response, out.Name())
 	}
-	err := writer.Close()
-	if err != nil {
-		return nil, &ErrorResonse{StatusCode: 500, Reason: fmt.Errorf("there is error , please try again")}
-	}
-	req, err := http.NewRequest("POST", os.Getenv("UPLOAD_URL")+"/photos", body)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	if err != nil {
-		return nil, &ErrorResonse{StatusCode: 503, Reason: fmt.Errorf("there is error , please try again")}
-	}
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, &ErrorResonse{StatusCode: res.StatusCode, Reason: err}
-	}
-	return res, nil
+
+	return response, nil
 }

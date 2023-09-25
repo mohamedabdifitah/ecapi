@@ -21,11 +21,11 @@ var (
 func Initserver() {
 	server = gin.New()
 	port := os.Getenv("PORT")
+	server.Use(gin.Recovery(), gin.Logger())
 	InitRoutes(server)
 	if os.Getenv("GIN_MODE") == "release" {
 		server.Run(fmt.Sprintf(":" + port)) // listen
 	}
-	server.Use(gin.Recovery(), gin.Logger())
 	// this is fix for windows defender popup
 	server.Run(fmt.Sprintf("localhost:" + port))
 }
