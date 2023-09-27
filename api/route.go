@@ -79,9 +79,9 @@ func OrderRouterDefinition() {
 	OrderRouter.GET("/get/:id", controller.GetOrderByid)
 	OrderRouter.POST("/place", controller.PlaceOrder)
 	OrderRouter.GET("/customer/all/:id", controller.GetOrderByCustomer)
-	OrderRouter.GET("/location", controller.GetOrderByLocation)                                                                     // polygons , longitude and latitude are
-	OrderRouter.POST("/driver/accept/:id", middleware.AuthorizeRolesMiddleware([]string{"driver"}), controller.AccpetOrderByDriver) // driver accepts to deliver the request of order
-	OrderRouter.POST("/assign/:oid/:did", middleware.AuthorizeRolesMiddleware([]string{"merchant", "admin"}), controller.AssignOrderToDriver)
+	OrderRouter.GET("/location", controller.GetOrderByLocation)                                                                      // polygons , longitude and latitude are
+	OrderRouter.PATCH("/driver/accept/:id", middleware.AuthorizeRolesMiddleware([]string{"driver"}), controller.AccpetOrderByDriver) // driver accepts to deliver the request of order
+	OrderRouter.PATCH("/assign/:oid/:did", middleware.AuthorizeRolesMiddleware([]string{"merchant", "admin"}), controller.AssignOrderToDriver)
 	OrderRouter.PATCH("/merchant/decline/:id", middleware.AuthorizeRolesMiddleware([]string{"merchant"}), controller.RejectOrderByMerchant)
 	OrderRouter.PATCH("/merchant/accept/:id", middleware.AuthorizeRolesMiddleware([]string{"merchant"}), controller.MerchantOrderAccept)
 	OrderRouter.PATCH("/customer/cancel", middleware.AuthorizeRolesMiddleware([]string{"customer"}), controller.CancelOrder)

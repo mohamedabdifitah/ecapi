@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
+	"github.com/mohamedabdifitah/ecapi/service"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/exp/slices"
@@ -181,6 +182,10 @@ func MerchantOrderAccept(c *gin.Context) {
 		c.String(400, "order is not found")
 		return
 	}
+	if order.Stage == "cancel" {
+		c.String(400, "order is canceled")
+		return
+	}
 	if order.Stage != "placed" {
 		c.String(400, "order is already accepted")
 		return
@@ -191,9 +196,19 @@ func MerchantOrderAccept(c *gin.Context) {
 		{Key: "metadata.update_at", Value: time.Now()},
 		{Key: "stage", Value: "accepted"},
 	}}}
-	res, err := db.ChangeOrder(filter, change, "merchant-accpted", order)
+	res, err := db.UpdateOrder(filter, change)
 	if err != nil {
 		c.String(400, err.Error())
+		return
+	}
+	order, err = db.GetOrderBy(bson.D{{Key: "_id", Value: res.UpsertedID}})
+	if err != nil {
+		c.String(400, "order is not found")
+		return
+	}
+	err = service.PublishTopic("merchant-accpted", order)
+	if err != nil {
+		c.String(500, "server error , please try again")
 		return
 	}
 	c.JSON(200, res)
@@ -295,11 +310,13 @@ func CancelOrder(c *gin.Context) {
 	info["id"] = objectid
 	info["cancel_reason"] = CancelReason[1] + " " + reason
 	info["customer_id"] = customerid
-	res, err := db.ChangeOrder(filter, change, "order_canceled", info)
+	res, err := db.UpdateOrder(filter, change)
 	if err != nil {
 		c.String(400, err.Error())
 		return
 	}
+	service.PublishTopic("order_canceled", info)
+
 	c.JSON(200, res)
 }
 func RejectOrderByMerchant(c *gin.Context) {
@@ -354,10 +371,11 @@ func RejectOrderByMerchant(c *gin.Context) {
 	info["id"] = objectid
 	info["cancel_reason"] = CancelReason[0] + " " + reason
 	info["merchant_id"] = merchantid
-	res, err := db.ChangeOrder(filter, change, "order_canceled", info)
+	res, err := db.UpdateOrder(filter, change)
 	if err != nil {
 		c.String(400, err.Error())
 		return
 	}
+	service.PublishTopic("order_canceled", info)
 	c.JSON(200, res)
 }

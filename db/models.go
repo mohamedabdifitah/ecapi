@@ -119,6 +119,8 @@ type Merchant struct {
 	Device            Device             `json:"-" bson:"device"`
 	Category          []string           `json:"category" bson:"category"` // fast food , drinks , resturant or
 	Rate              Rate               `json:"rate" bson:"rate"`
+	Badge             Badge              `json:"badge" bson:"badge"`
+	Closed            bool               `json:"closed" bson:"closed"`
 	// Discount          uint               `json:"discount" bson:"discount"` // 20% discount up to 5
 }
 type Review struct {
@@ -135,10 +137,10 @@ type ReviewColl struct {
 	ExternalId string  `bson:"external_id" json:"external_id"`
 }
 type Coupon struct {
-	Token             string             `json:"token" bson:"token"`
-	Rate              uint               `json:"rate" bson:"rate"`                                 // percentage of the discount
-	TimeOperatorStart primitive.DateTime `bson:"time_operation_start" json:"time_operation_start"` // Datetime Started
-	TimeOperatorEnd   primitive.DateTime `bson:"time_operation_end" json:"time_operation_end"`     // Datetime End coupon expires
+	Token             string    `json:"token" bson:"token"`
+	Rate              uint      `json:"rate" bson:"rate"`                                 // percentage of the discount
+	TimeOperatorStart time.Time `bson:"time_operation_start" json:"time_operation_start"` // Datetime Started
+	TimeOperatorEnd   time.Time `bson:"time_operation_end" json:"time_operation_end"`     // Datetime End coupon expires
 }
 type Otp struct {
 	Code  string `bson:"code" json:"code"`
