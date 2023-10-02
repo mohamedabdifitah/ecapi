@@ -174,7 +174,7 @@
         ]
       }
     },
-    "/v1/login_user": {
+    "/customer/signin/email": {
       "post": {
         "summary": "Login user",
         "description": "Use this API to login user and get access token \u0026 refresh token",
@@ -187,9 +187,15 @@
             }
           },
           "default": {
-            "description": "An unexpected error response.",
+            "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/pbLoginUserResponse"
+            }
+          },
+          "401": {
+            "description": "un Authorized action.",
+            "schema":{
+              "message": "You have entered an invalid password"
             }
           }
         },
@@ -199,12 +205,12 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/pbLoginUserRequest"
+              "$ref": "#/definitions/pbLoginCustomerRequest"
             }
           }
         ],
         "tags": [
-          "SimpleBank"
+          "customer"
         ]
       }
     },
@@ -306,10 +312,10 @@
         "$ref": "#/definitions/pbUser"
       }
     },
-    "pbLoginUserRequest": {
+    "pbLoginCustomerRequest": {
       "type": "object",
       "properties": {
-        "username": {
+        "email": {
           "type": "string"
         },
         "password": {
@@ -320,25 +326,11 @@
     "pbLoginUserResponse": {
       "type": "object",
       "properties": {
-        "user": {
-          "$ref": "#/definitions/pbUser"
-        },
-        "sessionId": {
+        "refresh_token": {
           "type": "string"
         },
-        "accessToken": {
+        "access_token": {
           "type": "string"
-        },
-        "refreshToken": {
-          "type": "string"
-        },
-        "accessTokenExpiresAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "refreshTokenExpiresAt": {
-          "type": "string",
-          "format": "date-time"
         }
       }
     },
