@@ -106,7 +106,7 @@ func DeleteCustomer(c *gin.Context) {
 
 }
 func ChangeCustomerPassword(c *gin.Context) {
-	var id string = c.Param("id")
+	var id string = c.GetHeader("ssid")
 	var body *ChangePasswordBody
 	objecId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -133,7 +133,7 @@ func ChangeCustomerPassword(c *gin.Context) {
 	c.String(200, "successfully changed password")
 }
 func ChangeCustomerEmail(c *gin.Context) {
-	var id string = c.Param("id")
+	var id string = c.GetHeader("ssid")
 	var body *ChangeEmaildBody
 	objecId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -182,7 +182,7 @@ func CustomerEmailLogin(c *gin.Context) {
 	c.JSON(200, tokens)
 }
 func ChangeCustomerDevice(c *gin.Context) {
-	id := c.Param("id")
+	var id string = c.GetHeader("ssid")
 	var body map[string]interface{}
 	objectid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -209,7 +209,7 @@ func ChangeCustomerDevice(c *gin.Context) {
 	c.JSON(200, res)
 }
 func ChangeCustomerProfile(c *gin.Context) {
-	id := c.Param("id")
+	var id string = c.GetHeader("ssid")
 	objectid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.String(400, "Invalid id ")

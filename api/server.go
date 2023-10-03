@@ -8,14 +8,7 @@ import (
 )
 
 var (
-	server         *gin.Engine
-	CustomerRouter *gin.RouterGroup
-	OrderRouter    *gin.RouterGroup
-	MerchantRouter *gin.RouterGroup
-	DriverRouter   *gin.RouterGroup
-	ReviewRouter   *gin.RouterGroup
-	MenuRouter     *gin.RouterGroup
-	Router         *gin.RouterGroup
+	server *gin.Engine
 )
 
 func Initserver() {
@@ -36,11 +29,7 @@ func InitRoutes(server *gin.Engine) {
 		path.Static("/doc", "./doc")
 	}
 	path.Static("/assets", "./assets")
-	CustomerRouter = path.Group("/customer")
-	DriverRouter = path.Group("/driver")
-	MerchantRouter = path.Group("/merchant")
-	OrderRouter = path.Group("/order")
-	MenuRouter = path.Group("/menu")
-	ReviewRouter = path.Group("/review")
-	RouterDefinition()
+	for _, r := range Routes {
+		r.register()
+	}
 }
