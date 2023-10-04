@@ -20,6 +20,6 @@ func main() {
 	}
 	service.InitRedisClient()
 	db.ConnectDB()
+	service.InitMelliClient()
 	api.Initserver()
-
 }

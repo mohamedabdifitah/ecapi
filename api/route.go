@@ -374,4 +374,14 @@ var Routes []GroupRoute = []GroupRoute{
 			},
 		},
 	},
+	{
+		prefix: "/",
+		routes: []Route{
+			{
+				method:   "GET",
+				path:     "search",
+				handlers: []gin.HandlerFunc{controller.Search},
+			},
+		},
+	},
 }
