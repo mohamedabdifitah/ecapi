@@ -1,0 +1,26 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "SomFood Order System Api",
+    "version": "1",
+    "contact": {
+      "name": "Somali Food ( SomFood )",
+      "url": "https://github.com/mohamedabdifitah/ecapi",
+      "email": "mohamedabdfitah30@gmail.com"
+    }
+  },
+  "tags": [
+    {
+      "name": "SomFood"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    {{.Paths}}
+  }
+}

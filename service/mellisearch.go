@@ -11,5 +11,4 @@ func InitMelliClient() {
 		Host:   "http://localhost:7700",
 		APIKey: "aX0s_rDilOB0l1yl_AnwaQYcauOzEBeQ24WVb9Lyrrg",
 	})
-
 }

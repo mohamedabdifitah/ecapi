@@ -16,5 +16,5 @@ func Search(c *gin.Context) {
 		c.String(400, err.Error())
 		return
 	}
-	c.JSON(200, hints.Hits)
+	c.JSON(200, hints)
 }
