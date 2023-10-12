@@ -206,3 +206,45 @@ func UpdateDriver(query bson.M, change bson.D) (*mongo.UpdateResult, error) {
 	}
 	return res, err
 }
+func GetByDriversLocation(location []float64, maxdist int64, mindist int64) ([]*Driver, error) {
+	var drivers []*Driver
+	filter := bson.D{
+		{Key: "location", Value: bson.D{
+			{
+				Key: "$near", Value: bson.D{
+					{
+						Key: "$geometry", Value: bson.D{
+							{
+								Key: "type", Value: "Point",
+							},
+							{
+								Key: "coordinates", Value: location,
+							},
+						},
+					},
+					{
+						Key: "$maxDistance", Value: maxdist,
+					},
+					{
+						Key: "$minDistance", Value: mindist,
+					},
+				},
+			},
+		}},
+	}
+	protectedfileds := []string{"password", "metadata.token_version", "metadata.provider"}
+	cursor, err := DriverCollection.Find(Ctx, filter, options.Find().SetProjection(ProtectFields(protectedfileds)))
+	if err != nil {
+		return nil, err
+	}
+	for cursor.Next(Ctx) {
+		var driver *Driver
+		err := cursor.Decode(&driver)
+		if err != nil {
+			return nil, err
+		}
+		drivers = append(drivers, driver)
+	}
+	cursor.Close(Ctx)
+	return drivers, nil
+}

@@ -363,6 +363,11 @@ var Routes []GroupRoute = []GroupRoute{
 				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{}), controller.GetListDrivers},
 			},
 			{
+				method:   "GET",
+				path:     "/location",
+				handlers: []gin.HandlerFunc{controller.GetDrivesByLocation},
+			},
+			{
 				method:   "PATCH",
 				path:     "/change/password/:id",
 				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"driver"}), controller.ChangeDriverPassword},

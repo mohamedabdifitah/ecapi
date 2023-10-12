@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -281,6 +282,21 @@ func GetListDrivers(c *gin.Context) {
 	}
 	query := bson.M{"_id": bson.M{"$in": oids}}
 	drivers, err := db.GetDrivers(query, nil)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, drivers)
+}
+func GetDrivesByLocation(c *gin.Context) {
+	longtitude, err := strconv.ParseFloat(c.Query("lang"), 64)
+	latitude, err := strconv.ParseFloat(c.Query("lat"), 64)
+	mindist, err := strconv.ParseInt(c.Query("mindist"), 0, 64)
+	maxdist, err := strconv.ParseInt(c.Query("maxdist"), 0, 64)
+	if err != nil {
+		c.String(400, err.Error())
+	}
+	drivers, err := db.GetByDriversLocation([]float64{longtitude, latitude}, maxdist, mindist)
 	if err != nil {
 		c.String(500, err.Error())
 		return

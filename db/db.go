@@ -58,6 +58,7 @@ func ConnectDB() {
 	CreateGeoIndex("location", MerchantCollection)
 	CreateGeoIndex("dropoff_location", OrderCollection)
 	CreateGeoIndex("pickup_location", OrderCollection)
+	CreateGeoIndex("location", DriverCollection)
 	CreateIndex("order_id", ReviewCollection)
 }
 func CloseDB() error {

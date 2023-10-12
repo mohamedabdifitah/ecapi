@@ -140,7 +140,6 @@ func GetOrderByLocation(c *gin.Context) {
 	latitude, err := strconv.ParseFloat(c.Query("lat"), 64)
 	mindist, err := strconv.ParseInt(c.Query("mindist"), 0, 64)
 	maxdist, err := strconv.ParseInt(c.Query("maxdist"), 0, 64)
-	fmt.Println(maxdist, mindist)
 	if err != nil {
 		c.String(400, err.Error())
 	}
