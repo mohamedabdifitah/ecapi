@@ -202,7 +202,7 @@ func MerchantOrderAccept(c *gin.Context) {
 		c.String(400, "order is not found")
 		return
 	}
-	err = service.PublishTopic("merchant-accpted", order)
+	err = service.PublishTopic("merchant_accpted_order", order)
 	if err != nil {
 		c.String(500, "server error , please try again")
 		return
@@ -302,16 +302,23 @@ func CancelOrder(c *gin.Context) {
 		{Key: "stage", Value: "cancel"},
 		{Key: "cancel_reason", Value: CancelReason[1] + " " + reason},
 	}}}
-	info := make(map[string]interface{})
-	info["id"] = objectid
-	info["cancel_reason"] = CancelReason[1] + " " + reason
-	info["customer_id"] = customerid
 	res, err := db.UpdateOrder(filter, change)
 	if err != nil {
 		c.String(400, err.Error())
 		return
 	}
-	service.PublishTopic("order_canceled", info)
+	query = bson.D{
+		{
+			Key:   "_id",
+			Value: objectid,
+		},
+	}
+	order, err = db.GetOrderBy(query)
+	err = service.PublishTopic("order_canceled", order)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
 
 	c.JSON(200, res)
 }
@@ -363,16 +370,23 @@ func RejectOrderByMerchant(c *gin.Context) {
 		{Key: "stage", Value: "cancel"},
 		{Key: "cancel_reason", Value: CancelReason[0] + " " + reason},
 	}}}
-	info := make(map[string]interface{})
-	info["id"] = objectid
-	info["cancel_reason"] = CancelReason[0] + " " + reason
-	info["merchant_id"] = merchantid
 	res, err := db.UpdateOrder(filter, change)
 	if err != nil {
 		c.String(400, err.Error())
 		return
 	}
-	service.PublishTopic("order_canceled", info)
+	query = bson.D{
+		{
+			Key:   "_id",
+			Value: objectid,
+		},
+	}
+	order, err = db.GetOrderBy(query)
+	err = service.PublishTopic("order_canceled", order)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
 	c.JSON(200, res)
 }
 func DropOrderByDriver(c *gin.Context) {

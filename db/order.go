@@ -171,7 +171,7 @@ func (o *Order) PlaceOrder() (*mongo.InsertOneResult, *ErrorResponse) {
 	if err != nil {
 		return nil, &ErrorResponse{Status: 400, Message: err, Type: "string"}
 	}
-	err = service.PublishTopic("new-order", json)
+	err = service.PublishTopic("new_order", json)
 	if err != nil {
 		return nil, &ErrorResponse{Status: 500, Message: fmt.Errorf("server error , please try again"), Type: "string"}
 	}
@@ -222,7 +222,7 @@ func AssignOrderToDriver(orderId primitive.ObjectID, driverId primitive.ObjectID
 	if err != nil {
 		return nil, &ErrorResponse{Message: fmt.Errorf("order is not found"), Status: 400, Type: "string"}
 	}
-	err = service.PublishTopic("driver-accepted", order)
+	err = service.PublishTopic("driver_accepted_order", order)
 	if err != nil {
 		return nil, &ErrorResponse{Message: fmt.Errorf("server error , try again later"), Status: 500, Type: "string"}
 	}
@@ -264,7 +264,7 @@ func DropOrder(orderId primitive.ObjectID, driverId string) (*mongo.UpdateResult
 	if err != nil {
 		return nil, &ErrorResponse{Message: fmt.Errorf("order is not found"), Status: 400, Type: "string"}
 	}
-	err = service.PublishTopic("order-drop", order)
+	err = service.PublishTopic("order_dropped", order)
 	if err != nil {
 		return nil, &ErrorResponse{Message: fmt.Errorf("server error , try again later"), Status: 500, Type: "string"}
 	}
