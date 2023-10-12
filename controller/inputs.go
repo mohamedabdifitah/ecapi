@@ -53,10 +53,9 @@ type PhoneLoginBody struct {
 	Password string `json:"password"`
 }
 type DriverBody struct {
-	Age         string `json:"age"`
-	GivenName   string `json:"given_name"`
-	Address     string `json:"address"`
-	VehicleType string `json:"vehicle_type"`
+	Age       string `json:"age"`
+	GivenName string `json:"given_name"`
+	Address   string `json:"address"`
 }
 type SignUpWithDriverBody struct {
 	Phone    string `json:"phone"`

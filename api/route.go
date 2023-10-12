@@ -99,6 +99,11 @@ var Routes []GroupRoute = []GroupRoute{
 			},
 			{
 				method:   "PATCH",
+				path:     "/change/webhooks",
+				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"customer"}), controller.ChangeCustomerWebhooks},
+			},
+			{
+				method:   "PATCH",
 				path:     "/change/profile",
 				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"customer"}), controller.ChangeCustomerDevice},
 			},
@@ -224,6 +229,11 @@ var Routes []GroupRoute = []GroupRoute{
 			},
 			{
 				method:   "PATCH",
+				path:     "/drop/:id",
+				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"driver", "admin"}), controller.DropOrderByDriver},
+			},
+			{
+				method:   "PATCH",
 				path:     "/merchant/decline/:id",
 				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"merchant"}), controller.RejectOrderByMerchant},
 			},
@@ -236,6 +246,26 @@ var Routes []GroupRoute = []GroupRoute{
 				method:   "PATCH",
 				path:     "/customer/cancel",
 				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"customer", "admin"}), controller.CancelOrder},
+			},
+			{
+				method:   "PATCH",
+				path:     "/stage/prepare/:id",
+				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"merchant"}), controller.ChangeOrderStatus("preparing")},
+			},
+			{
+				method:   "PATCH",
+				path:     "/stage/pickuped/:id",
+				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"merchant"}), controller.ChangeOrderStatus("pickuped")},
+			},
+			{
+				method:   "PATCH",
+				path:     "/stage/ready/:id",
+				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"merchant"}), controller.ChangeOrderStatus("ready")},
+			},
+			{
+				method:   "PATCH",
+				path:     "/stage/delivered/:id",
+				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"driver"}), controller.OrderIsDelivered},
 			},
 			{
 				method:   "GET",
@@ -286,6 +316,11 @@ var Routes []GroupRoute = []GroupRoute{
 				method:   "PATCH",
 				path:     "/change/profile/:id",
 				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"merchant"}), controller.ChangeMerchantProfile},
+			},
+			{
+				method:   "PATCH",
+				path:     "/change/webhooks",
+				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"merchant"}), controller.ChangeMerchantWebhooks},
 			},
 			{
 				method:   "DELETE",
@@ -341,6 +376,16 @@ var Routes []GroupRoute = []GroupRoute{
 				method:   "PATCH",
 				path:     "/change/device/:id",
 				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"driver"}), controller.ChangeDriverDevice},
+			},
+			{
+				method:   "PATCH",
+				path:     "/change/location",
+				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"driver"}), controller.ChangeDriverLocation},
+			},
+			{
+				method:   "PATCH",
+				path:     "/change/webhook",
+				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"driver"}), controller.ChangeDriverWebhooks},
 			},
 			{
 				method:   "PATCH",

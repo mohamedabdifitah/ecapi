@@ -75,7 +75,7 @@ func (d *Driver) Update() (*mongo.UpdateResult, error) {
 	filter := bson.M{"_id": d.Id}
 	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "age", Value: d.Age},
-		{Key: "vehicle_type", Value: d.VehicleType},
+		{Key: "vehicle", Value: d.Vehicle},
 		{Key: "given_name", Value: d.GivenName},
 		{Key: "address", Value: d.Address},
 		{Key: "metadata.updated_at", Value: time.Now().UTC()},

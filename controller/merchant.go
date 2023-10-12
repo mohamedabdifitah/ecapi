@@ -278,3 +278,39 @@ func ChangeMerchantProfile(c *gin.Context) {
 	}
 	c.JSON(200, confirm)
 }
+func ChangeMerchantWebhooks(c *gin.Context) {
+	var id string = c.GetHeader("ssid")
+	objectid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.String(400, "invalid id")
+		return
+	}
+	var body map[string]string
+	err = c.ShouldBindJSON(&body)
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	webhook, ok := body["webhook"]
+	if !ok {
+		c.String(400, "Required webhook")
+		return
+	}
+	query := bson.M{"_id": objectid}
+	// no set
+	change := bson.D{
+		{
+			Key: "$set", Value: bson.D{
+				{
+					Key: "metadata.webhook_endpoint", Value: webhook,
+				},
+			},
+		},
+	}
+	res, err := db.UpdateMerchant(query, change)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, res)
+}

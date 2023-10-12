@@ -25,7 +25,7 @@ func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if tokenHeader == "" && len(strings.Split(tokenHeader, " ")) < 2 {
+		if tokenHeader == "" || len(strings.Split(tokenHeader, " ")) < 2 {
 			c.String(401, "authorization key not found")
 			c.Abort()
 			return
@@ -34,8 +34,8 @@ func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 		token, err := utils.VerifyAccessToken(tokenString)
 		if err != nil {
 			if errors.Is(err, jwt.ErrTokenExpired) {
-				if ReftokenHeader == "" && len(strings.Split(ReftokenHeader, " ")) < 2 {
-					c.String(401, "authorization key not found")
+				if ReftokenHeader == "" || len(strings.Split(ReftokenHeader, " ")) < 2 {
+					c.String(401, "token expired , please login again")
 					c.Abort()
 					return
 				}
@@ -135,24 +135,5 @@ func AuthorizeRolesMiddleware(permissions []string) gin.HandlerFunc {
 
 		}
 
-	}
-}
-func Authenticate(token string) {
-
-}
-func TokenErrorHandler(c *gin.Context, err error) {
-
-	switch err {
-	// case jwt.ErrTokenExpired:
-	case jwt.ErrInvalidKey:
-		c.String(401, "Invalid token")
-		c.Abort()
-		break
-	// case jwt.ErrTokenExpired:
-	default:
-		c.JSON(401, err)
-		// break
-		c.Abort()
-		break
 	}
 }

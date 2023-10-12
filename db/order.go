@@ -228,3 +228,45 @@ func AssignOrderToDriver(orderId primitive.ObjectID, driverId primitive.ObjectID
 	}
 	return res, nil
 }
+
+// drop the order like driver decline order after he accept
+func DropOrder(orderId primitive.ObjectID, driverId string) (*mongo.UpdateResult, *ErrorResponse) {
+	order := &Order{
+		Id: orderId,
+	}
+	err := order.GetById()
+	if err != nil {
+		return nil, &ErrorResponse{Message: fmt.Errorf("order is not found"), Status: 400, Type: "string"}
+	}
+	if order.DriverExternalId != driverId {
+		return nil, &ErrorResponse{Message: fmt.Errorf("you cannot drop order , that you're driver"), Status: 403, Type: "string"}
+	}
+	if order.Stage == "deleivered" {
+		return nil, &ErrorResponse{Message: fmt.Errorf("order is already delivered"), Status: 403, Type: "string"}
+	}
+	if order.Stage == "cancelled" {
+		return nil, &ErrorResponse{Message: fmt.Errorf("order is already cancelled"), Status: 403, Type: "string"}
+	}
+	if order.Stage == "pickuped" {
+		return nil, &ErrorResponse{Message: fmt.Errorf("you cannot drop order if you already have a pickuped"), Status: 403, Type: "string"}
+	}
+	query := bson.M{"_id": order.Id}
+	change := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "metadata.update_at", Value: time.Now()},
+		{Key: "driver_external_id", Value: ""},
+		{Key: "driver_phone", Value: ""},
+	}}}
+	res, err := UpdateOrder(query, change)
+	if err != nil {
+		return nil, &ErrorResponse{Message: err, Status: 500}
+	}
+	order, err = GetOrderBy(bson.D{{Key: "_id", Value: res.UpsertedID}})
+	if err != nil {
+		return nil, &ErrorResponse{Message: fmt.Errorf("order is not found"), Status: 400, Type: "string"}
+	}
+	err = service.PublishTopic("order-drop", order)
+	if err != nil {
+		return nil, &ErrorResponse{Message: fmt.Errorf("server error , try again later"), Status: 500, Type: "string"}
+	}
+	return res, nil
+}

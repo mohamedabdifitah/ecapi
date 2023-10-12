@@ -75,11 +75,9 @@ func UpdateDriver(c *gin.Context) {
 		return
 	}
 	driver := db.Driver{
-		Id:          objecId,
-		Address:     body.Address,
-		GivenName:   body.GivenName,
-		VehicleType: body.VehicleType,
-		// Age:         body.Age,
+		Id:        objecId,
+		Address:   body.Address,
+		GivenName: body.GivenName,
 	}
 	res, err := driver.Update()
 	if err != nil {
@@ -288,4 +286,78 @@ func GetListDrivers(c *gin.Context) {
 		return
 	}
 	c.JSON(200, drivers)
+}
+func ChangeDriverLocation(c *gin.Context) {
+	var id string = c.GetHeader("ssid")
+	objectid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.String(400, "invalid id")
+		return
+	}
+	var body map[string][]float64
+	err = c.ShouldBindJSON(&body)
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	location, ok := body["location"]
+	if !ok {
+		c.String(400, "Required Location")
+		return
+	}
+	query := bson.M{"_id": objectid}
+	change := bson.D{
+		{
+			Key: "$set", Value: bson.D{
+				{
+					Key: "location", Value: db.Location{
+						Type:        "Point",
+						Coordinates: location,
+					},
+				},
+			},
+		},
+	}
+	res, err := db.UpdateDriver(query, change)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, res)
+}
+func ChangeDriverWebhooks(c *gin.Context) {
+	var id string = c.GetHeader("ssid")
+	objectid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.String(400, "invalid id")
+		return
+	}
+	var body map[string]string
+	err = c.ShouldBindJSON(&body)
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	webhook, ok := body["webhook"]
+	if !ok {
+		c.String(400, "Required webhook")
+		return
+	}
+	query := bson.M{"_id": objectid}
+	// no set
+	change := bson.D{
+		{
+			Key: "$set", Value: bson.D{
+				{
+					Key: "metadata.webhook_endpoint", Value: webhook,
+				},
+			},
+		},
+	}
+	res, err := db.UpdateDriver(query, change)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	c.JSON(200, res)
 }

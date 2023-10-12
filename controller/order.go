@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -133,11 +134,6 @@ func GetOrderByDriver(c *gin.Context) {
 		return
 	}
 	c.JSON(200, orders)
-}
-func DriverAcceptOrder(c *gin.Context) {
-	// driver information
-	// order information => weighting order information => vehicle type
-	// notifying redis subscribers
 }
 func GetOrderByLocation(c *gin.Context) {
 	longtitude, err := strconv.ParseFloat(c.Query("lang"), 64)
@@ -377,5 +373,104 @@ func RejectOrderByMerchant(c *gin.Context) {
 		return
 	}
 	service.PublishTopic("order_canceled", info)
+	c.JSON(200, res)
+}
+func DropOrderByDriver(c *gin.Context) {
+	var orderId string = c.Param("id")
+	objectid, err := primitive.ObjectIDFromHex(orderId)
+	if err != nil {
+		c.String(400, "invalid order id")
+		return
+	}
+	var driverId string = c.GetHeader("ssid")
+	res, erres := db.DropOrder(objectid, driverId)
+	if erres != nil {
+		if erres.Type == "string" {
+			c.String(erres.Status, erres.Message.Error())
+			return
+		}
+		c.JSON(erres.Status, erres.Message)
+		return
+	}
+	c.JSON(200, res)
+}
+func ChangeOrderStatus(stage string) gin.HandlerFunc {
+	if !slices.Contains([]string{"preparing", "ready", "pickuped"}, stage) {
+		log.Fatal("unknow stage")
+	}
+	return func(c *gin.Context) {
+		var id string = c.Param("id")
+		var merid string = c.GetHeader("ssid")
+		objectid, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			c.String(400, err.Error())
+			c.Abort()
+			return
+		}
+		query := bson.M{"_id": objectid, "pickup_external_id": merid}
+		change := bson.D{
+			{
+				Key: "$set", Value: bson.D{
+					{
+						Key: "stage", Value: stage,
+					},
+				},
+			},
+		}
+		res, err := db.UpdateOrder(query, change)
+		if err != nil {
+			c.String(500, err.Error())
+			c.Abort()
+			return
+		}
+		order, err := db.GetOrderBy(bson.D{{Key: "_id", Value: objectid}})
+		if err != nil {
+			c.String(400, err.Error())
+			c.Abort()
+			return
+		}
+		err = service.PublishTopic(fmt.Sprintf("order_%s"+stage), order)
+		if err != nil {
+			c.String(500, "internal error , please try again")
+			c.Abort()
+			return
+		}
+		c.JSON(200, res)
+		c.Abort()
+	}
+}
+func OrderIsDelivered(c *gin.Context) {
+	var id string = c.Param("id")
+	var drid string = c.GetHeader("ssid")
+	objectid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	query := bson.M{"_id": objectid, "driver_external_id": drid}
+	change := bson.D{
+		{
+			Key: "$set", Value: bson.D{
+				{
+					Key: "stage", Value: "delivered",
+				},
+			},
+		},
+	}
+	res, err := db.UpdateOrder(query, change)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
+	order, err := db.GetOrderBy(bson.D{{Key: "_id", Value: objectid}})
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+	err = service.PublishTopic("order_delivered", order)
+	if err != nil {
+		c.String(500, "internal error , please try again")
+		return
+	}
 	c.JSON(200, res)
 }

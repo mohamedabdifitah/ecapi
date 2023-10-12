@@ -80,29 +80,37 @@ type Customer struct {
 	Phone      string             `bson:"phone" json:"phone"`
 }
 type AccountMetadata struct {
-	TokenVersion int       `bson:"token_version" json:"-"`
-	CreatedAt    time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at" bson:"updated_at"`
-	LasLogin     time.Time `bson:"Last_login" json:"last_login"`
-	Provider     string    `bson:"provider" json:"-"` // google , email , facebook
+	TokenVersion    int       `bson:"token_version" json:"-"`
+	CreatedAt       time.Time `json:"created_at" bson:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at" bson:"updated_at"`
+	LasLogin        time.Time `bson:"last_login" json:"last_login"`
+	WebhookEndpoint string    `json:"webhook_endpoint" bson:"webhook_endpoint"`
+	Provider        string    `bson:"provider" json:"-"` // google , email , facebook
 }
 type Setting struct {
 	ReceiveNotification bool `bson:"receive_notification,omitempty" json:"receive_notification"`
 	ReceiveUpdates      bool `bson:"receive_update" json:"receive_update"`
 }
 type Driver struct {
-	Id          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
-	Password    string             `json:"-" bson:"password"`
-	Email       string             `json:"email" bson:"email"`
-	Phone       string             `json:"phone" bson:"phone"`
-	GivenName   string             `json:"given_name" bson:"given_name"`
-	VehicleType string             `json:"vehicle_type" bson:"vehicle_type"` // car , motorcycle
-	Age         primitive.DateTime `json:"age" bson:"age"`
-	Address     string             `json:"address" bson:"address"`
-	Metadata    AccountMetadata    `json:"metadata" bson:"metadata"`
-	Profile     string             `json:"profile" bson:"profile"`
-	Device      Device             `json:"-" bson:"device"`
-	Rate        Rate               `json:"rate" bson:"rate"`
+	Id        primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Password  string             `json:"-" bson:"password"`
+	Email     string             `json:"email" bson:"email"`
+	Phone     string             `json:"phone" bson:"phone"`
+	GivenName string             `json:"given_name" bson:"given_name"`
+	Age       primitive.DateTime `json:"age" bson:"age"`
+	Address   string             `json:"address" bson:"address"`
+	Metadata  AccountMetadata    `json:"metadata" bson:"metadata"`
+	Profile   string             `json:"profile" bson:"profile"`
+	Device    Device             `json:"-" bson:"device"`
+	Rate      Rate               `json:"rate" bson:"rate"`
+	Location  Location           `json:"location" bson:"location"`
+	Satus     bool               `json:"status" bson:"status"` // true available, false unavailable
+	Vehicle   Vehicle            `json:"vehicle" bson:"vehicle"`
+}
+type Vehicle struct {
+	Model   string  `json:"model" bson:"model"`
+	Type    string  `json:"type" bson:"type"`
+	Payload float64 `json:"payload" bson:"pay"` // kg
 }
 type Merchant struct {
 	Id                primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65
