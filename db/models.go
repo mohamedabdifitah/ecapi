@@ -110,7 +110,7 @@ type Driver struct {
 type Vehicle struct {
 	Model   string  `json:"model" bson:"model"`
 	Type    string  `json:"type" bson:"type"`
-	Payload float64 `json:"payload" bson:"pay"` // kg
+	Payload float64 `json:"payload" bson:"payload"` // kg
 }
 type Merchant struct {
 	Id                primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65
