@@ -29,7 +29,7 @@ func UploadFiles(base string, files ...*multipart.FileHeader) ([]string, *ErrorR
 			return response, &ErrorResonse{StatusCode: 500, Reason: err}
 		}
 		var extension string = strings.Split(file.Filename, ".")[1]
-		var name string = base + "/" + "hello" + "." + extension
+		var name string = base + "/" + generateRandomString(5) + "." + extension
 		out, err := os.Create(name)
 		if err != nil {
 			return response, &ErrorResonse{StatusCode: 500, Reason: err}
