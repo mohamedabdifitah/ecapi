@@ -1,20 +1,22 @@
 package controller
 
 import (
-	"fmt"
-
+	"github.com/algolia/algoliasearch-client-go/v3/algolia/opt"
+	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
 	"github.com/gin-gonic/gin"
-	"github.com/meilisearch/meilisearch-go"
 	"github.com/mohamedabdifitah/ecapi/service"
 )
 
 func Search(c *gin.Context) {
 	var text string = c.Query("text")
-	fmt.Println(text)
-	hints, err := service.Melli.Index("data").Search(text, &meilisearch.SearchRequest{})
+	queries := []search.IndexedQuery{
+		search.NewIndexedQuery("merchant", opt.Query(text)),
+		search.NewIndexedQuery("menu", opt.Query(text)),
+	}
+	res, err := service.MultipleSearchDocument(queries)
 	if err != nil {
 		c.String(400, err.Error())
 		return
 	}
-	c.JSON(200, hints)
+	c.JSON(200, res)
 }

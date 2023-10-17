@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mohamedabdifitah/ecapi/service"
 	"github.com/mohamedabdifitah/ecapi/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
@@ -30,6 +32,8 @@ func (m *Merchant) Save() (*mongo.InsertOneResult, *ErrorResponse) {
 	if err != nil {
 		return nil, DBErrorHandler(err)
 	}
+	m.Id = res.InsertedID.(primitive.ObjectID)
+	go service.CreateDocument("merchant", m)
 	return res, nil
 }
 func (m *Merchant) GetById() error {

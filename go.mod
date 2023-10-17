@@ -20,6 +20,7 @@ require (
 	cloud.google.com/go/iam v1.1.1 // indirect
 	cloud.google.com/go/longrunning v0.5.1 // indirect
 	cloud.google.com/go/storage v1.33.0 // indirect
+	github.com/algolia/algoliasearch-client-go/v3 v3.31.0 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect

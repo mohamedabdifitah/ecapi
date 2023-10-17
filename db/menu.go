@@ -1,8 +1,10 @@
 package db
 
 import (
+	"fmt"
 	"time"
 
+	"github.com/mohamedabdifitah/ecapi/service"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -22,8 +24,13 @@ func (m *Menu) Create() (*mongo.InsertOneResult, error) {
 		IsDup(err)
 		return nil, err
 	}
-	// res.Decode(&c)
-	return res, nil
+	m.Id = res.InsertedID.(primitive.ObjectID)
+	go service.CreateDocument("menu", m)
+
+	return &mongo.InsertOneResult{}, nil
+}
+func PrintN(name string) {
+	fmt.Println(name)
 }
 func (m *Menu) Update() (*mongo.UpdateResult, error) {
 	filter := bson.M{"_id": m.Id}
