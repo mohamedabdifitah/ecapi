@@ -46,7 +46,8 @@ type Order struct {
 	DropOffPhone          string             `json:"dropoff_phone" bson:"dropoff_phone"`
 	DropOffExteranlId     string             `json:"dropoff_external_id" bson:"dropoff_external_id"`
 	DropOffContactName    string             `json:"dropoff_contact_name" bson:"dropoff_contact_name"`
-	DropOffTimeEstimated  time.Time          `json:"dropoff_time_estimated" bson:"dropoff_time_estimated"`
+	DropOffTimeEstimated  int                `json:"dropoff_time_estimated" bson:"dropoff_time_estimated"`
+	DropOffTime           time.Time          `json:"dropoff_time" bson:"dropoff_time"`
 	DropOffAddress        string             `json:"dropoff_address" bson:"dropoff_address"`   // address 901 Market Street 6th Floor San Francisco, CA 94103
 	DroOffLocation        Location           `json:"dropoff_location" bson:"dropoff_location"` // location cordinates. float([123.1312343,-37.2144343])
 	DropOffInstruction    string             `json:"dropoff_instructions" bson:"dropoff_instructions"`

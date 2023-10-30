@@ -442,7 +442,8 @@ func ChangeOrderStatus(stage string) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		err = service.PublishTopic(fmt.Sprintf("order_%s"+stage), order)
+		fmt.Println("order_" + stage)
+		err = service.PublishTopic("order_"+stage, order)
 		if err != nil {
 			c.String(500, "internal error , please try again")
 			c.Abort()

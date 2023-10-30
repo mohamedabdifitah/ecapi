@@ -213,6 +213,11 @@ var Routes []GroupRoute = []GroupRoute{
 				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"customer", "admin"}), controller.GetOrderByCustomer},
 			},
 			{
+				method:   "POST",
+				path:     "/place",
+				handlers: []gin.HandlerFunc{controller.PlaceOrder},
+			},
+			{
 				method:   "GET",
 				path:     "/location",
 				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{}), controller.GetOrderByLocation},

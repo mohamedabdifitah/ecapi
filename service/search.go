@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
+	// "github.com/meilisearch/meilisearch-go/"
 )
 
 type Record struct {

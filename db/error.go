@@ -30,12 +30,6 @@ func DBErrorHandler(err error) *ErrorResponse {
 			Type:    "string",
 		}
 	}
-	if mongo.IsDuplicateKeyError(err) {
-		return &ErrorResponse{
-			Status:  409,
-			Message: err,
-		}
-	}
 	if mongo.IsNetworkError(err) {
 		return &ErrorResponse{
 			Status:  500,
@@ -48,9 +42,11 @@ func DBErrorHandler(err error) *ErrorResponse {
 			switch we.Code {
 			// duplicate filed
 			case 11000:
+				var field string = strings.Split(strings.Split(we.Message, "dup key: {")[1], "}")[0]
+
 				return &ErrorResponse{
 					Status:  409,
-					Message: err,
+					Message: fmt.Errorf(field),
 				}
 			// Can't extract geo keys
 			case 16755:

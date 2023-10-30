@@ -54,14 +54,42 @@ func SignUpCustomerWithEmail(c *gin.Context) {
 	}
 	res, err := customer.Save()
 	if err != nil {
-		c.JSON(500, err.Error())
+		eres := utils.HandlerError(err)
+		c.JSON(eres.Status, eres.Message)
 		return
 	}
-	c.JSON(201, res)
+	c.JSON(201, res.InsertedID)
+}
+func CompleteSignUp(c *gin.Context) {
+	var body *CustomerBody
+	var id string = c.Param("ssid")
+	objecId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.String(400, "Invalid customer id")
+		return
+	}
+	err = c.ShouldBindJSON(&body)
+	if err != nil {
+		c.JSON(400, err)
+		return
+	}
+	customer := db.Customer{
+		Id:         objecId,
+		Address:    body.Address,
+		GivenName:  body.GivenName,
+		FamilyName: body.FamilyName,
+		Phone:      body.Phone,
+	}
+	res, err := customer.Update()
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
+	c.JSON(200, res)
 }
 func UpdateCustomer(c *gin.Context) {
 	var body *CustomerBody
-	var id string = c.Param("id")
+	var id string = c.GetHeader("ssid")
 	objecId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.String(400, "Invalid customer id")
