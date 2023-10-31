@@ -26,7 +26,7 @@ func DBErrorHandler(err error) *ErrorResponse {
 	if mongo.IsTimeout(err) {
 		return &ErrorResponse{
 			Status:  503, // or even you can 408 which means request timeout
-			Message: fmt.Errorf("Request took too long to respond"),
+			Message: fmt.Errorf("request took too long to respond"),
 			Type:    "string",
 		}
 	}

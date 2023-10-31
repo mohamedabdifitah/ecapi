@@ -133,7 +133,10 @@ func (r *Review) Delete() (*mongo.DeleteResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = service.PublishTopic("review", r)
+	if err = service.PublishTopic("review", r); err != nil {
+		return nil, err
+	}
+
 	return result, nil
 }
 

@@ -142,7 +142,7 @@ func CustomerLoginCheck(email string, password string, device Device) (*TokenRes
 		res := &ErrorResponse{
 			Status:  401,
 			Type:    "string",
-			Message: fmt.Errorf("You have entered an invalid email"),
+			Message: fmt.Errorf("you have entered an invalid email"),
 		}
 		return nil, res
 	}
@@ -151,7 +151,7 @@ func CustomerLoginCheck(email string, password string, device Device) (*TokenRes
 		res := &ErrorResponse{
 			Status:  401,
 			Type:    "string",
-			Message: fmt.Errorf("You have entered an invalid password"),
+			Message: fmt.Errorf("you have entered an invalid password"),
 		}
 		return nil, res
 	}

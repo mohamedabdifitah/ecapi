@@ -22,7 +22,7 @@ func UploadFiles(base string, files ...*multipart.FileHeader) ([]string, *ErrorR
 	for _, file := range files {
 		src, err := file.Open()
 		if err != nil {
-			return response, &ErrorResonse{StatusCode: 400, Reason: fmt.Errorf("File could not be opened")}
+			return response, &ErrorResonse{StatusCode: 400, Reason: fmt.Errorf("file could not be opened")}
 		}
 		defer src.Close()
 		if err = os.MkdirAll(filepath.Dir(base), 0750); err != nil {
@@ -40,7 +40,7 @@ func UploadFiles(base string, files ...*multipart.FileHeader) ([]string, *ErrorR
 		if err != nil {
 			return response, &ErrorResonse{StatusCode: 500, Reason: err}
 		}
-		response = append(response, out.Name())
+		response = append(response, os.Getenv("HOST_NAME")+out.Name())
 	}
 
 	return response, nil

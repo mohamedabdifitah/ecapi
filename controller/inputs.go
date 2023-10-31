@@ -71,6 +71,7 @@ type MenuBody struct {
 	Attributes   db.Attributes `json:"attributes" bson:"attributes"`
 	Reciepe      []string      `json:"reciepe" bson:"reciepe"`
 	EstimateTime int           `json:"estimate_time"`
+	Images       []string      `json:"images"`
 }
 type ReviewBody struct {
 	OrderId        string             `json:"order_id"`

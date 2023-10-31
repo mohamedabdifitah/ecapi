@@ -73,7 +73,7 @@ func CreateMenu(c *gin.Context) {
 		MerchantExternalId: merchantid,
 		Reciepe:            body.Reciepe,
 		EstimateTime:       body.EstimateTime,
-		Images:             []string{},
+		Images:             body.Images,
 	}
 	res, err := menu.Create()
 	if err != nil {
@@ -105,6 +105,7 @@ func UpdateMenu(c *gin.Context) {
 		Status:       body.Status,
 		Attributes:   body.Attributes,
 		EstimateTime: body.EstimateTime,
+		Images:       body.Images,
 	}
 	res, err := menu.Update()
 	if err != nil {

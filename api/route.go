@@ -437,6 +437,21 @@ var Routes []GroupRoute = []GroupRoute{
 				path:     "search",
 				handlers: []gin.HandlerFunc{controller.Search},
 			},
+			{
+				method:   "GET",
+				path:     "multisearch",
+				handlers: []gin.HandlerFunc{controller.MultiSearch},
+			},
+		},
+	},
+	{
+		prefix: "/upload",
+		routes: []Route{
+			{
+				method:   "POST",
+				path:     "/file",
+				handlers: []gin.HandlerFunc{controller.UploadFile},
+			},
 		},
 	},
 }

@@ -1,0 +1,1321 @@
+openapi: 3.0.0
+info:
+  title: ecapi
+  version: 1.0.0
+servers:
+  - url: http://localhost
+  - url: http://{{ecapi_host}}
+components:
+  securitySchemes:
+    noauthAuth:
+      type: http
+      scheme: noauth
+tags:
+  - name: customer
+  - name: notification
+  - name: merchant
+  - name: Driver
+  - name: Menu
+  - name: review
+  - name: order
+  - name: search
+  - name: upload file
+paths:
+  /customer/signup/email:
+    post:
+      tags:
+        - customer
+      summary: SingupEmail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: example@domain.com
+                password: '123456'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /customer/all:
+    get:
+      tags:
+        - customer
+      summary: AllCustomer
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: >-
+            Bearer
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTA5OTIxNjgsImlkIjoiT2JqZWN0SUQoXCI2NGM4YTA5NzQxZGY5ZjZkMTYwY2M1NDZcIikiLCJlbWFpbCI6ImV4YW1wbGVAZG9tYWluLmNvbSIsInJvbGUiOiJjdXN0b21lciJ9.MdqgEo_ps1aRJ7nipxFgD7aoXlN2Un_23ALyZZlWJHY
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: >-
+            Bearer
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTgxODcxMzgsImlkIjoiT2JqZWN0SUQoXCI2NGM4YTA5NzQxZGY5ZjZkMTYwY2M1NDZcIikiLCJlbWFpbCI6ImV4YW1wbGVAZG9tYWluLmNvbSIsInRva2VuX3YiOjB9.haU8XEWhOPCWt44kM3L85hHgm25LSd2V4t66J02ckD0
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /customer/get/64e79bdbb443c479b1846028:
+    get:
+      tags:
+        - customer
+      summary: getCustomer
+      parameters:
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{driver_id}}'
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_id_token}}
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_ref_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /customer/update/64c8a09741df9f6d160cc546:
+    put:
+      tags:
+        - customer
+      summary: Update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                given_name: mohamed
+                family_name: cabdifitah
+                address: labadhagax mogadishu somalia
+                phone: '+252619592722'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /customer/change/password/64c8a09741df9f6d160cc546:
+    patch:
+      tags:
+        - customer
+      summary: changePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                new_password: '9592722'
+                old_password: '123456'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /customer/signin/email:
+    post:
+      tags:
+        - customer
+      summary: siginEmail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: example@domain.com
+                password: '123456'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /merchant/all:
+    get:
+      tags:
+        - merchant
+      summary: GetAll
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /merchant/get/64ea387416182c259943067b:
+    get:
+      tags:
+        - merchant
+      summary: Get Id
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_id_token}}
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_ref_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{driver_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /merchant/signup/phone:
+    post:
+      tags:
+        - merchant
+      summary: SignupPhone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                business_phone: '+252619592726'
+                password: '123456'
+                business_name: Forno Ubax
+                location:
+                  - 2.056376292919158
+                  - 45.32247912826367
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /merchant/update/64ed9548c2e9087107264ce6:
+    put:
+      tags:
+        - merchant
+      summary: updateMerchant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                business_name: Forno Ubax
+                address: 384F+G25, Mogadishu
+                business_email: forno@ubax.com
+                time_operation_start: 700
+                time_operation_end: 2100
+                location:
+                  - 2.056376292919158
+                  - 45.32247912826367
+                category:
+                  - Fast Food
+                  - dessert
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /merchant/signin/phone:
+    post:
+      tags:
+        - merchant
+      summary: merchantlogin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                phone: '+252619592722'
+                password: '123456'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /merchant/change/password/64ed9548c2e9087107264ce6:
+    patch:
+      tags:
+        - merchant
+      summary: changePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                new_password: '9592722'
+                old_password: '123456'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /merchant/change/phone/64ed9548c2e9087107264ce6:
+    patch:
+      tags:
+        - merchant
+      summary: changePhone
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                new_phone: '+252619592722'
+                old_phone: '+252619592726'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /merchant/location:
+    get:
+      tags:
+        - merchant
+      summary: merchant location
+      parameters:
+        - name: lang
+          in: query
+          schema:
+            type: number
+          example: '2.054781033666946'
+        - name: lat
+          in: query
+          schema:
+            type: number
+          example: '45.323820465183545'
+        - name: mindist
+          in: query
+          schema:
+            type: integer
+          example: '0'
+        - name: maxdist
+          in: query
+          schema:
+            type: integer
+          example: '400'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /merchant/device/change/64da6ab01173fd9a41aa0dee:
+    patch:
+      tags:
+        - merchant
+      summary: change device
+      requestBody:
+        content: {}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /merchant/change/profile/64da6ab01173fd9a41aa0dee:
+    patch:
+      tags:
+        - merchant
+      summary: change profile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /driver/all:
+    get:
+      tags:
+        - Driver
+      summary: get all
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{admin_id_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{admin_id}}'
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: '{{admin_ref_token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /driver/get/64e79b46b443c479b1846027:
+    get:
+      tags:
+        - Driver
+      summary: Get Driver
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_id_token}}
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_ref_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{driver_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /driver/signin/phone:
+    post:
+      tags:
+        - Driver
+      summary: signin email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                phone: '+252619592722'
+                password: '123456'
+      parameters:
+        - name: device_id
+          in: header
+          schema:
+            type: string
+          example: >-
+            eqiX28fQSBOAKKTN83ddR2:APA91bENpx3egIMY6OVva-V0zqc-OH3xSqN0rUJ-QA7fwOYIg65bQC1rhuFpI5CdTsuRM7rhsU3byDCBZSOR2rm0WxuEAgjxdG9Vy2Hhjn7dvdPdFg_-rVtl_NliMe4RMhlEf_uC3Uab
+        - name: device_kind
+          in: header
+          schema:
+            type: string
+          example: andriod
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /driver/update/64e79b46b443c479b1846027:
+    put:
+      tags:
+        - Driver
+      summary: Update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                vehicle_type: car
+                address: ee
+                given_name: Mohamed Abdiftah
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /driver/device/change/64cc9dfe8e1fedbc480bbcd8:
+    get:
+      tags:
+        - Driver
+      summary: change device
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /driver/change/profile/64cc9dfe8e1fedbc480bbcd8:
+    patch:
+      tags:
+        - Driver
+      summary: change profile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /driver/list:
+    get:
+      tags:
+        - Driver
+      summary: get list drivers
+      parameters:
+        - name: ids
+          in: query
+          schema:
+            type: string
+          example: 64cc9dfe8e1fedbc480bbcd8
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /driver/location:
+    get:
+      tags:
+        - Driver
+      summary: Drivers location
+      parameters:
+        - name: lang
+          in: query
+          schema:
+            type: number
+          example: '2.041185559230089'
+        - name: lat
+          in: query
+          schema:
+            type: number
+          example: '45.31806980890057'
+        - name: mindist
+          in: query
+          schema:
+            type: integer
+          example: '0'
+        - name: maxdist
+          in: query
+          schema:
+            type: integer
+          example: '100'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /driver/change/location:
+    patch:
+      tags:
+        - Driver
+      summary: change driver location
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                location:
+                  - 2.041185559230089
+                  - 45.31806980890057
+      parameters:
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{driver_id}}'
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_id_token}}
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_ref_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /menu/all:
+    get:
+      tags:
+        - Menu
+      summary: get all
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_id_token}}
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_ref_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{driver_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /menu/create:
+    post:
+      tags:
+        - Menu
+      summary: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                title: Chicken Burger
+                description: 'chicken burger '
+                status: available
+                price: 100
+                category: fastfood
+                reciepe:
+                  - chicken
+                  - bread
+                barcode: '344456'
+                attributes:
+                  length: 30
+                  width: 40
+                  height: 10
+                  volume: 200
+                merchant_external_id: 64ea387416182c259943067b
+                estimate_time: 60
+                images:
+                  - http://localhost/assets/dS5XJ.png
+      parameters:
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{mer_id}}'
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: barear {{mer_id_token}}
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: barear {{mer_ref_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /menu/update/6540f643513658146828d376:
+    put:
+      tags:
+        - Menu
+      summary: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                title: Chicken Burge
+                description: 'chicken burger '
+                status: available
+                category: fastfood
+                images:
+                  - http://localhost/assets/dS5XJ.png
+                  - http://localhost/assets/99BKJ.png
+                price: 100
+                attributes:
+                  volume: 200
+                  height: 10
+                  width: 40
+                  length: 30
+                metadata:
+                  created_at: '2023-10-31T12:42:43.66Z'
+                  updated_at: '0001-01-01T00:00:00Z'
+                merchant_external_id: 64ea387416182c259943067b
+                reciepe:
+                  - chicken
+                  - bread
+                estimate_time: 60
+      parameters:
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{mer_ref_token}}
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{mer_id_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{mer_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /menu/get/6540f643513658146828d376:
+    get:
+      tags:
+        - Menu
+      summary: get id
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_id_token}}
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_ref_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{driver_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /menu/merchant/{mer_id}:
+    get:
+      tags:
+        - Menu
+      summary: from merchant
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{mer_id_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{mer_id}}'
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{mer_ref_token}}
+        - name: mer_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /menu/image/add/64da66471173fd9a41aa0de8:
+    put:
+      tags:
+        - Menu
+      summary: add image
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                upload:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /review/all:
+    get:
+      tags:
+        - review
+      summary: get all
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /review/user/64e79bdbb443c479b1846028:
+    get:
+      tags:
+        - review
+      summary: user reviews
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /review/to/merchant/64ea387416182c259943067b:
+    get:
+      tags:
+        - review
+      summary: to
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /review/to/driver/64ea387416182c259943067b:
+    get:
+      tags:
+        - review
+      summary: to Copy
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /review/create:
+    post:
+      tags:
+        - review
+      summary: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                order_id: 64ec6146dc7d404e429b7a3c
+                from: 64e79bdbb443c479b1846028
+                merchant_review:
+                  message: it very good delicous food
+                  rate: 4.5
+                  external_id: 64ea387416182c259943067b
+                driver_review:
+                  message: respectul good
+                  rate: 3.9
+                  external_id: 64e79b46b443c479b1846027
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /review/delete/6506f906301480d72c9c4683:
+    delete:
+      tags:
+        - review
+      summary: delete
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /review/update/64d10110497ca3a45f395e91:
+    put:
+      tags:
+        - review
+      summary: New Request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                rate: 5
+                message: it awesome
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /review/get/6506f9b1638ddd102e52e136:
+    get:
+      tags:
+        - review
+      summary: get id
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/place:
+    post:
+      tags:
+        - order
+      summary: place order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                items:
+                  - quantity: 3
+                    item_external_id: 64eae7714886b561d48191ec
+                dropoff_phone: '+252619592722'
+                pickup_external_id: 64ea387416182c259943067b
+                dropoff_instructions: hand me
+                dropoff_location:
+                  - 2.0359655219667823
+                  - 45.33079524749176
+                dropoff_address: labadhagax ,sodonka street ,mogadishu,somalia
+                dropoff_contact_name: Mohamed Abdifitah Ahmed
+                dropoff_external_id: 64e79bdbb443c479b1846028
+                type: pickup
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/all:
+    get:
+      tags:
+        - order
+      summary: get all
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: barear {{admin_id_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{admin_id}}'
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: '{{admin_ref_token}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/get/6531251e95fe0fab191307ca:
+    get:
+      tags:
+        - order
+      summary: get id
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: barear {{driver_id_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{driver_id}}'
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_ref_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/customer/all/64c8a09741df9f6d160cc546:
+    get:
+      tags:
+        - order
+      summary: get customer orders
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/merchant/all/64ea387416182c259943067b:
+    get:
+      tags:
+        - order
+      summary: get merchant orders
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/driver/all/64c8a09741df9f6d160cc546:
+    get:
+      tags:
+        - order
+      summary: get driver orders
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/location:
+    get:
+      tags:
+        - order
+      summary: get order location
+      parameters:
+        - name: lang
+          in: query
+          schema:
+            type: number
+          example: '2.041185559230089'
+        - name: lat
+          in: query
+          schema:
+            type: number
+          example: '45.31806980890057'
+        - name: mindist
+          in: query
+          schema:
+            type: integer
+          example: '0'
+        - name: maxdist
+          in: query
+          schema:
+            type: integer
+          example: '1000'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/merchant/accept/650e7e4213f29e6cb4d9e017:
+    patch:
+      tags:
+        - order
+      summary: merchant accept
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: >-
+            Barear
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTI1MDY1NzksImlkIjoiT2JqZWN0SUQoXCI2NGRhNmFiMDExNzNmZDlhNDFhYTBkZWVcIikiLCJlbWFpbCI6IisyNTI2MTk1OTI3MjIiLCJyb2xlIjoibWVyY2hhbnQifQ.lKc1Ku2ZFSKqHu2ZWFrLFXxnGnJM_NOfhg7viTQ1tiY
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: 64ea387416182c259943067b
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: >-
+            Barear
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDMwMzUzOTAsImlkIjoiT2JqZWN0SUQoXCI2NGVhMzg3NDE2MTgyYzI1OTk0MzA2N2JcIikiLCJlbWFpbCI6IisyNTI2MTk1OTI3MjIiLCJ0b2tlbl92IjowfQ.JKDHJVCO6i_5EXiFdRwhiQP1l6nVrP4turLQgjRAIe8
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/driver/accept/64dce482d23aec1b05c0bb12:
+    patch:
+      tags:
+        - order
+      summary: Driver Accept
+      requestBody:
+        content: {}
+      parameters:
+        - name: ssid
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - order
+      summary: accept order to driver
+      requestBody:
+        content: {}
+      parameters:
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: 64cc9dfe8e1fedbc480bbcd8
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: >-
+            Baearer
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTI1MzA4MzEsImlkIjoiNjRjYzlkZmU4ZTFmZWRiYzQ4MGJiY2Q4IiwiZW1haWwiOiIrMjUyNjE5NTkyNzIyIiwicm9sZSI6ImRyaXZlciJ9.v3zDepoXdcmXA9TPw3BY0xxQgFDpYG9MswV0LmPRHNg
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/assign/64dce482d23aec1b05c0bb12/64cc9dfe8e1fedbc480bbcd8:
+    post:
+      tags:
+        - order
+      summary: assign order to driver
+      requestBody:
+        content: {}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/merchant/decline/64ec6146dc7d404e429b7a3c:
+    patch:
+      tags:
+        - order
+      summary: decline order
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: >-
+            barear
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTMyODQzNDQsImlkIjoiNjRlYTM4NzQxNjE4MmMyNTk5NDMwNjdiIiwiZW1haWwiOiIrMjUyNjE5NTkyNzIyIiwicm9sZSI6Im1lcmNoYW50In0.e3RKH382mjfIAW2Ov0_IBjVCCgABdO8vUqwkXu-jX_4
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: 64ea387416182c259943067b
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: >-
+            Baear
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDA0OTQyNDYsImlkIjoiT2JqZWN0SUQoXCI2NGVhMzg3NDE2MTgyYzI1OTk0MzA2N2JcIikiLCJlbWFpbCI6IisyNTI2MTk1OTI3MjIiLCJ0b2tlbl92IjowfQ.r1I3XTzq8mLS_H1yelB-jl6bKdB7wpNEZuo62GYoUXM
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/drop/650e7e4213f29e6cb4d9e017:
+    patch:
+      tags:
+        - order
+      summary: droporder
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '""'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_id_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{driver_id}}'
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_ref_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/stage/ready/6531251e95fe0fab191307ca:
+    patch:
+      tags:
+        - order
+      summary: preparing
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{mer_id_token}}
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{mer_ref_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{mer_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/stage/ready/64eaeb6144887b9ce8e513e0:
+    patch:
+      tags:
+        - order
+      summary: ready
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{mer_id_token}}
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{mer_ref_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{mer_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/stage/pickuped/6531251e95fe0fab191307ca:
+    patch:
+      tags:
+        - order
+      summary: pickuped
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{mer_id_token}}
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{mer_ref_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{mer_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /order/stage/delivered/6531251e95fe0fab191307ca:
+    patch:
+      tags:
+        - order
+      summary: delivered
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_id_token}}
+        - name: refresh_token
+          in: header
+          schema:
+            type: string
+          example: Barear {{driver_ref_token}}
+        - name: ssid
+          in: header
+          schema:
+            type: string
+          example: '{{driver_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /search:
+    get:
+      tags:
+        - search
+      summary: searchone
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          example: http://localhost/assets/99BKJ.png
+        - name: index
+          in: query
+          schema:
+            type: string
+          example: menu
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /multisearch:
+    get:
+      tags:
+        - search
+      summary: multisearch
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /upload/file:
+    post:
+      tags:
+        - upload file
+      summary: New Request
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}

@@ -155,7 +155,7 @@ func DriverLoginCheck(phone string, password string, device Device) (*TokenRespo
 		res := &ErrorResponse{
 			Status:  401,
 			Type:    "string",
-			Message: fmt.Errorf("You have entered an invalid phone"),
+			Message: fmt.Errorf("you have entered an invalid phone"),
 		}
 		return nil, res
 	}
@@ -164,7 +164,7 @@ func DriverLoginCheck(phone string, password string, device Device) (*TokenRespo
 		res := &ErrorResponse{
 			Status:  401,
 			Type:    "string",
-			Message: fmt.Errorf("You have entered an invalid password"),
+			Message: fmt.Errorf("you have entered an invalid password"),
 		}
 		return nil, res
 	}

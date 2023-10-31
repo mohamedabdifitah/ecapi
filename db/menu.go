@@ -1,13 +1,13 @@
 package db
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/mohamedabdifitah/ecapi/service"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func (m *Menu) GetById() error {
@@ -25,12 +25,12 @@ func (m *Menu) Create() (*mongo.InsertOneResult, error) {
 		return nil, err
 	}
 	m.Id = res.InsertedID.(primitive.ObjectID)
-	go service.CreateDocument("menu", m)
-
-	return &mongo.InsertOneResult{}, nil
-}
-func PrintN(name string) {
-	fmt.Println(name)
+	var menu Menu = Menu{
+		Id: m.Id,
+	}
+	menu.GetById()
+	service.AddDocument("menu", menu)
+	return res, nil
 }
 func (m *Menu) Update() (*mongo.UpdateResult, error) {
 	filter := bson.M{"_id": m.Id}
@@ -43,18 +43,29 @@ func (m *Menu) Update() (*mongo.UpdateResult, error) {
 		{Key: "reciepe", Value: m.Reciepe},
 		{Key: "attributes", Value: m.Attributes},
 		{Key: "metadata.updated_at", Value: time.Now().UTC()},
+		{Key: "images", Value: m.Images},
 	}}}
 	result, err := MenuCollection.UpdateOne(Ctx, filter, update)
 	if err != nil {
 		return nil, err
 	}
+	var menu Menu = Menu{
+		Id: m.Id,
+	}
+	menu.GetById()
+	service.AddDocument("menu", menu)
 	return result, nil
 }
 func ChangeMenuField(filter bson.D, update bson.D) (*mongo.UpdateResult, error) {
-	result, err := MenuCollection.UpdateOne(Ctx, filter, update)
+	result, err := MenuCollection.UpdateOne(Ctx, filter, update, options.Update().SetUpsert(true))
 	if err != nil {
 		return nil, err
 	}
+	var menu Menu = Menu{
+		Id: result.UpsertedID.(primitive.ObjectID),
+	}
+	menu.GetById()
+	service.AddDocument("menu", menu)
 	return result, nil
 }
 func (m *Menu) Delete() (*mongo.DeleteResult, error) {

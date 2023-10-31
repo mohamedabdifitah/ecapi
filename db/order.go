@@ -91,7 +91,7 @@ func (o *Order) ExtractItems() *ErrorResponse {
 	for i, item := range o.Items {
 		ids, err := primitive.ObjectIDFromHex(item.ItemExternalId)
 		if err != nil {
-			return &ErrorResponse{Status: 400, Message: fmt.Errorf("Invalid Object ID of item %s", item.ItemExternalId), Type: "string"}
+			return &ErrorResponse{Status: 400, Message: fmt.Errorf("invalid id of item %s", item.ItemExternalId), Type: "string"}
 		}
 		oids[i] = ids
 	}
@@ -135,6 +135,9 @@ func (o *Order) BeforeSave() *ErrorResponse {
 }
 func (o *Order) PickuPExtract() *ErrorResponse {
 	objectid, err := primitive.ObjectIDFromHex(o.PickUpExternalId)
+	if err != nil {
+		return &ErrorResponse{Status: 400, Message: fmt.Errorf("invalid id"), Type: "string"}
+	}
 	merchant := Merchant{
 		Id: objectid,
 	}

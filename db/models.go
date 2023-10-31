@@ -64,7 +64,7 @@ type Order struct {
 	DriverPhone           string             `bson:"driver_phone" json:"driver_phone"`
 	DriverAllowedVehicles []string           `json:"driver_allowed_vehicles" bson:"driver_allowed_vehicles" ` // car , motorcycle , walking
 	DriverExternalId      string             `bson:"driver_external_id" json:"driver_external_id"`
-	Metadata              Metadata           `bson:"metadata" json:"metadata" bson:"metadata"`
+	Metadata              Metadata           `bson:"metadata" json:"metadata"`
 	CancelReason          string             `bson:"cancel_reason" json:"cancel_reason"`
 }
 
@@ -79,6 +79,7 @@ type Customer struct {
 	Password   string             `bson:"password" json:"-"`
 	Device     Device             `bson:"device" json:"-"`
 	Phone      string             `bson:"phone" json:"phone"`
+	Generes    []string           `bson:"generes" json:"generes"`
 }
 type AccountMetadata struct {
 	TokenVersion    int       `bson:"token_version" json:"-"`

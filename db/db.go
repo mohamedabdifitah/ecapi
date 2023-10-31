@@ -14,9 +14,9 @@ import (
 )
 
 var (
-	Mongoclient        *mongo.Client
-	Ctx                context.Context
-	cancel             context.CancelFunc
+	Mongoclient *mongo.Client
+	Ctx         context.Context
+	// cancel             context.CancelFunc
 	err                error
 	CustomerCollection *mongo.Collection
 	DriverCollection   *mongo.Collection

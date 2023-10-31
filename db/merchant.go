@@ -33,7 +33,7 @@ func (m *Merchant) Save() (*mongo.InsertOneResult, *ErrorResponse) {
 		return nil, DBErrorHandler(err)
 	}
 	m.Id = res.InsertedID.(primitive.ObjectID)
-	go service.CreateDocument("merchant", m)
+	go service.AddDocument("merchant", m)
 	return res, nil
 }
 func (m *Merchant) GetById() error {
@@ -91,6 +91,11 @@ func (m *Merchant) Update() (*mongo.UpdateResult, error) {
 	if err != nil {
 		return nil, err
 	}
+	var merchant Merchant = Merchant{
+		Id: m.Id,
+	}
+	merchant.GetById()
+	service.AddDocument("merchant", merchant)
 	return result, nil
 }
 func (m *Merchant) ChangeBusinessPhone(OldPhone string, NewPhone string) (*mongo.UpdateResult, error) {
@@ -151,7 +156,7 @@ func MerchantLoginCheck(phone string, password string, device Device) (*TokenRes
 		res := &ErrorResponse{
 			Status:  401,
 			Type:    "string",
-			Message: fmt.Errorf("You have entered an invalid business phone number"),
+			Message: fmt.Errorf("you have entered an invalid business phone number"),
 		}
 		return nil, res
 	}
@@ -160,7 +165,7 @@ func MerchantLoginCheck(phone string, password string, device Device) (*TokenRes
 		res := &ErrorResponse{
 			Status:  401,
 			Type:    "string",
-			Message: fmt.Errorf("You have entered an invalid password"),
+			Message: fmt.Errorf("you have entered an invalid password"),
 		}
 		return nil, res
 	}

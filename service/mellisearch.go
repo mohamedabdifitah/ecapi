@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/meilisearch/meilisearch-go"
@@ -13,6 +14,7 @@ func InitMelliClient() {
 		Host:   "http://localhost:7700",
 		APIKey: os.Getenv("MELLI_API_KEY"),
 	})
+	fmt.Println("Melli client initialized")
 }
 func AddDocument(index string, data interface{}) error {
 	_, err := Melli.Index(index).AddDocuments(data)
@@ -27,6 +29,14 @@ func Search(index string, query string, SearchRequest meilisearch.SearchRequest)
 		return nil, err
 	}
 	return res, nil
+}
+func GetAll() (meilisearch.DocumentsResult, error) {
+	var result meilisearch.DocumentsResult
+	err := Melli.Index("merchant").GetDocuments(&meilisearch.DocumentsQuery{}, &result)
+	if err != nil {
+		return meilisearch.DocumentsResult{}, err
+	}
+	return result, nil
 }
 
 // example
