@@ -1,9 +1,0 @@
-"200": {
-            "description": "A successful response.",
-            "schema": {
-              "type":"{{.type}}",
-              "properties": {
-                {{.properties}}
-              }
-            }
-          }
