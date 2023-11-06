@@ -138,10 +138,11 @@ func GetOrderByDriver(c *gin.Context) {
 func GetOrderByLocation(c *gin.Context) {
 	longtitude, err := strconv.ParseFloat(c.Query("lang"), 64)
 	latitude, err := strconv.ParseFloat(c.Query("lat"), 64)
-	mindist, err := strconv.ParseInt(c.Query("mindist"), 0, 64)
-	maxdist, err := strconv.ParseInt(c.Query("maxdist"), 0, 64)
+	mindist, err := strconv.ParseInt(c.Query("mindist"), 0, 32)
+	maxdist, err := strconv.ParseInt(c.Query("maxdist"), 0, 32)
 	if err != nil {
 		c.String(400, err.Error())
+		return
 	}
 	var order db.Order
 	location := []float64{
@@ -151,6 +152,7 @@ func GetOrderByLocation(c *gin.Context) {
 	orders, err := order.GetByLocation(location, maxdist, mindist)
 	if err != nil {
 		c.String(500, err.Error())
+		return
 	}
 	c.JSON(200, orders)
 }
@@ -287,13 +289,10 @@ func CancelOrder(c *gin.Context) {
 			Value: customerid,
 		},
 	}
-	order, err := db.GetOrderBy(query)
+	_, err = db.GetOrderBy(query)
 	if err != nil {
 		c.String(400, "order is not found")
 		return
-	}
-	if slices.Contains([]string{"accepted", "placed"}, order.Stage) {
-
 	}
 	filter := bson.M{"_id": objectid, "dropoff_external_id": customerid}
 	change := bson.D{{Key: "$set", Value: bson.D{
@@ -312,7 +311,10 @@ func CancelOrder(c *gin.Context) {
 			Value: objectid,
 		},
 	}
-	order, err = db.GetOrderBy(query)
+	order, err := db.GetOrderBy(query)
+	if err != nil {
+		c.String(500, "internal error")
+	}
 	err = service.PublishTopic("order_canceled", order)
 	if err != nil {
 		c.String(500, err.Error())
@@ -381,6 +383,10 @@ func RejectOrderByMerchant(c *gin.Context) {
 		},
 	}
 	order, err = db.GetOrderBy(query)
+	if err != nil {
+		c.String(500, "internal error fetch order")
+		return
+	}
 	err = service.PublishTopic("order_canceled", order)
 	if err != nil {
 		c.String(500, err.Error())
@@ -421,15 +427,32 @@ func ChangeOrderStatus(stage string) gin.HandlerFunc {
 			return
 		}
 		query := bson.M{"_id": objectid, "pickup_external_id": merid}
-		change := bson.D{
-			{
-				Key: "$set", Value: bson.D{
-					{
-						Key: "stage", Value: stage,
+		var change bson.D
+		if stage == "pickuped" {
+			change = bson.D{
+				{
+					Key: "$set", Value: bson.D{
+						{
+							Key: "stage", Value: stage,
+						},
+						{
+							Key: "pickup_time", Value: time.Now(),
+						},
 					},
 				},
-			},
+			}
+		} else {
+			change = bson.D{
+				{
+					Key: "$set", Value: bson.D{
+						{
+							Key: "stage", Value: stage,
+						},
+					},
+				},
+			}
 		}
+
 		res, err := db.UpdateOrder(query, change)
 		if err != nil {
 			c.String(500, err.Error())

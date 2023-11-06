@@ -131,6 +131,7 @@ func (o *Order) BeforeSave() *ErrorResponse {
 		return erres
 	}
 	o.ActionIfUndeliverable = "RETURN_TO_MERCHANT"
+	o.DisplayId = utils.GenerateIDs(8)
 	return nil
 }
 func (o *Order) PickuPExtract() *ErrorResponse {
@@ -143,12 +144,16 @@ func (o *Order) PickuPExtract() *ErrorResponse {
 	}
 	err = merchant.GetById()
 	if err != nil {
-		return &ErrorResponse{Status: 400, Message: fmt.Errorf("not found merchant"), Type: "string"}
+		return &ErrorResponse{Status: 400, Message: fmt.Errorf("merchant not found"), Type: "string"}
 	}
-	// 24 > 6 OR 24 < 20
-	ok := utils.IsTimeBetween(time.Now(), merchant.TimeOperatorStart, merchant.TimeOperatorEnd)
-	if !ok {
+	if merchant.Closed {
 		return &ErrorResponse{Status: 400, Message: fmt.Errorf("merchant is currently closed"), Type: "string"}
+	}
+	weekday := time.Now().Weekday()
+	today := merchant.ActiveDays[int(weekday)]
+	ok := utils.IsTimeBetween(time.Now(), today.TimeOperatorStart, today.TimeOperatorEnd)
+	if !ok {
+		return &ErrorResponse{Status: 400, Message: fmt.Errorf("merchant is closed"), Type: "string"}
 	}
 	o.PickUpLocation = merchant.Location
 	o.PickUpName = merchant.BusinessName

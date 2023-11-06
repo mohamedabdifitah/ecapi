@@ -89,12 +89,10 @@ func UpdateMerchant(c *gin.Context) {
 			Type:        "Point",
 			Coordinates: body.Location,
 		},
-		Address:           body.Address,
-		BusinessName:      body.BusinessName,
-		BusinessEmail:     body.BusinessEmail,
-		TimeOperatorStart: body.TimeOperationStart,
-		TimeOperatorEnd:   body.TimeOperationEnd,
-		Category:          body.Category,
+		Address:       body.Address,
+		BusinessName:  body.BusinessName,
+		BusinessEmail: body.BusinessEmail,
+		ActiveDays:    body.ActiveDays,
 	}
 	res, err := merchant.Update()
 	if err != nil {

@@ -22,15 +22,26 @@ func generateRandomString(length int) string {
 	}
 	return string(b)
 }
-func IsTimeBetween(Time time.Time, timeStart int, timeEnd int) bool {
+func IsTimeBetween(Time time.Time, timeStart float32, timeEnd float32) bool {
 	hours, minutes, _ := Time.Clock()
-	currUTCTimeInString := fmt.Sprintf("%d%02d", hours, minutes)
-	currUTCTime, err := strconv.ParseInt(currUTCTimeInString, 0, 64)
+	joinHrMinutes := fmt.Sprintf("%d.%d", hours, minutes)
+	currUTCTime, err := strconv.ParseFloat(joinHrMinutes, 32)
 	if err != nil {
-		panic(err)
+		return false
 	}
-	if int(currUTCTime) > timeStart && int(currUTCTime) < timeEnd {
+	currenTime := float32(currUTCTime)
+	if currenTime > timeStart && currenTime < timeEnd {
 		return true
 	}
 	return false
+
+}
+func GenerateIDs(length int) string {
+	const charset = "0123456789"
+	var seededRand *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seededRand.Intn(len(charset))]
+	}
+	return string(b)
 }

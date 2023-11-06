@@ -36,13 +36,13 @@ type SignUpMerchantWithPhoneBody struct {
 	Location      []float64 `json:"location" binding:"required"`
 }
 type MerchantBody struct {
-	Location           []float64 `json:"location"`
-	Address            string    `json:"address"`
-	BusinessEmail      string    `json:"business_email"`
-	TimeOperationStart int       `json:"time_operation_start"`
-	TimeOperationEnd   int       `json:"time_operation_end"`
-	BusinessName       string    `json:"business_name"`
-	Category           []string  `json:"category"`
+	Location           []float64       `json:"location"`
+	Address            string          `json:"address"`
+	BusinessEmail      string          `json:"business_email"`
+	TimeOperationStart float32         `json:"time_operation_start"`
+	TimeOperationEnd   float32         `json:"time_operation_end"`
+	BusinessName       string          `json:"business_name"`
+	ActiveDays         []db.ActiveDays `json:"active_days"`
 }
 type ChangePhonedBody struct {
 	NewPhone string `json:"new_phone"`
@@ -66,7 +66,7 @@ type MenuBody struct {
 	Title        string        `json:"title" bson:"title"`             // Burger
 	Description  string        `json:"description" bson:"description"` // Chicken fries contains
 	Status       string        `json:"status" bson:"status"`           // available , unavailable , banned
-	Category     string        `json:"category" bson:"category"`       // fast food , drink ,                     // Images of the product urls
+	Category     []string      `json:"category" bson:"category"`       // fast food , drink ,                     // Images of the product urls
 	Price        uint          `json:"price" bson:"price"`             // the price of the product is represented as cents 99 = $0.99
 	Attributes   db.Attributes `json:"attributes" bson:"attributes"`
 	Reciepe      []string      `json:"reciepe" bson:"reciepe"`

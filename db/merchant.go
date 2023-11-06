@@ -79,11 +79,9 @@ func (m *Merchant) Update() (*mongo.UpdateResult, error) {
 	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "location", Value: m.Location},
 		{Key: "business_name", Value: m.BusinessName},
-		{Key: "time_operation_start", Value: m.TimeOperatorStart},
-		{Key: "time_operation_end", Value: m.TimeOperatorEnd},
+		{Key: "active_days", Value: m.ActiveDays},
 		{Key: "business_email", Value: m.BusinessEmail},
 		{Key: "address", Value: m.Address},
-		{Key: "category", Value: m.Category},
 		{Key: "metadata.updated_at", Value: time.Now().UTC()},
 	}}}
 

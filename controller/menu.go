@@ -10,32 +10,17 @@ import (
 )
 
 func GetMenus(c *gin.Context) {
-	// var body *MenuBody
-	// err := c.ShouldBindJSON(&body)
-	// if err != nil {
-	// 	c.String(400, err.Error())
-	// 	return
-	// }
-	menu := &db.Menu{
-		// Title:              body.Title,
-		// Description:        body.Description,
-		// Category:           body.Category,
-		// Reciepe:            body.Reciepe,
-		// MerchantExternalId: body.MerchantExternalId,
-		// Price:              body.Price,
-		// Discount:           body.Discount,
-		// Status:             body.Status,
-	}
-	drivers, err := menu.GetAll()
+
+	menu := &db.Menu{}
+	menus, err := menu.GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, drivers)
+	c.JSON(http.StatusOK, menus)
 }
 func GetMenu(c *gin.Context) {
-	var id string
-	id = c.Param("id")
+	id := c.Param("id")
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.String(400, "Invalid Id")
