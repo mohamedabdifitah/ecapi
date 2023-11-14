@@ -3,9 +3,9 @@ module github.com/mohamedabdifitah/ecapi
 go 1.19
 
 require (
-	github.com/algolia/algoliasearch-client-go/v3 v3.31.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/meilisearch/meilisearch-go v0.25.1
+	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/stretchr/testify v1.8.4
 	go.mongodb.org/mongo-driver v1.12.0
 	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b

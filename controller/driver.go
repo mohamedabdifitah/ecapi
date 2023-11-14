@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
+	"github.com/mohamedabdifitah/ecapi/service"
 	"github.com/mohamedabdifitah/ecapi/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -40,7 +41,7 @@ func GetDriver(c *gin.Context) {
 	}
 	c.JSON(200, driver)
 }
-func SignUpDriverWithPhone(c *gin.Context) {
+func SignUpDriverWithEmail(c *gin.Context) {
 	var body *SignUpWithDriverBody
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
@@ -48,11 +49,11 @@ func SignUpDriverWithPhone(c *gin.Context) {
 		return
 	}
 	driver := db.Driver{
-		Phone:    body.Phone,
-		Email:    body.Emai,
-		Password: body.Password,
+		GivenName: body.Name,
+		Email:     body.Email,
+		Password:  body.Password,
 		Metadata: db.AccountMetadata{
-			Provider: "phone",
+			Provider: "email",
 		},
 	}
 	res, err := driver.Save()
@@ -60,6 +61,10 @@ func SignUpDriverWithPhone(c *gin.Context) {
 		c.JSON(500, err.Error())
 		return
 	}
+	var info map[string]string = make(map[string]string)
+	info["rec"] = driver.Email
+	info["type"] = "email"
+	go service.ProduceMessage("", "verification", "", info)
 	c.JSON(201, res)
 }
 func UpdateDriver(c *gin.Context) {
@@ -164,7 +169,7 @@ func ChangeDriverEmail(c *gin.Context) {
 	}
 	c.String(200, "email updated successfully")
 }
-func DriverPhoneLogin(c *gin.Context) {
+func DriverEmailLogin(c *gin.Context) {
 	var body *PhoneLoginBody
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
@@ -175,7 +180,7 @@ func DriverPhoneLogin(c *gin.Context) {
 		DeviceId: c.GetHeader("device_id"),
 		Kind:     c.GetHeader("device_kind"),
 	}
-	tokens, ErrorResponse := db.DriverLoginCheck(body.Phone, body.Password, device)
+	tokens, ErrorResponse := db.DriverLoginCheck(body.Email, body.Password, device)
 	if ErrorResponse != nil {
 		ErrorResponse.Error(c)
 		return

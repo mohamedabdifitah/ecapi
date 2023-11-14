@@ -1,7 +1,6 @@
 package db
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -174,15 +173,12 @@ func (o *Order) PlaceOrder() (*mongo.InsertOneResult, *ErrorResponse) {
 	}
 	// answer from https://www.mongodb.com/community/forums/t/insertone-returns-interface/131263/3
 	o.Id = res.InsertedID.(primitive.ObjectID)
-	json, err := json.Marshal(o)
+	order := o.GetById()
 
 	if err != nil {
 		return nil, &ErrorResponse{Status: 400, Message: err, Type: "string"}
 	}
-	err = service.PublishTopic("new_order", json)
-	if err != nil {
-		return nil, &ErrorResponse{Status: 500, Message: fmt.Errorf("server error , please try again"), Type: "string"}
-	}
+	go service.ProduceMessage("", "new_order", "", order)
 	return res, nil
 }
 func UpdateOrder(query bson.M, change bson.D) (*mongo.UpdateResult, error) {
@@ -230,10 +226,7 @@ func AssignOrderToDriver(orderId primitive.ObjectID, driverId primitive.ObjectID
 	if err != nil {
 		return nil, &ErrorResponse{Message: fmt.Errorf("order is not found"), Status: 400, Type: "string"}
 	}
-	err = service.PublishTopic("driver_accepted_order", order)
-	if err != nil {
-		return nil, &ErrorResponse{Message: fmt.Errorf("server error , try again later"), Status: 500, Type: "string"}
-	}
+	go service.ProduceMessage("", "driver_accepted_order", "", order)
 	return res, nil
 }
 
@@ -272,9 +265,7 @@ func DropOrder(orderId primitive.ObjectID, driverId string) (*mongo.UpdateResult
 	if err != nil {
 		return nil, &ErrorResponse{Message: fmt.Errorf("order is not found"), Status: 400, Type: "string"}
 	}
-	err = service.PublishTopic("order_dropped", order)
-	if err != nil {
-		return nil, &ErrorResponse{Message: fmt.Errorf("server error , try again later"), Status: 500, Type: "string"}
-	}
+	go service.ProduceMessage("", "order_dropped", "", order)
+
 	return res, nil
 }

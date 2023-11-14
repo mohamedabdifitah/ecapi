@@ -339,8 +339,8 @@ var Routes []GroupRoute = []GroupRoute{
 			},
 			{
 				method:   "POST",
-				path:     "/signup/phone",
-				handlers: []gin.HandlerFunc{controller.SignUpMerchantWithPhone},
+				path:     "/signup",
+				handlers: []gin.HandlerFunc{controller.SignUpMerchant},
 			},
 			{
 				method:   "POST",
@@ -420,12 +420,12 @@ var Routes []GroupRoute = []GroupRoute{
 			{
 				method:   "POST",
 				path:     "/signup",
-				handlers: []gin.HandlerFunc{controller.SignUpDriverWithPhone},
+				handlers: []gin.HandlerFunc{controller.SignUpDriverWithEmail},
 			},
 			{
 				method:   "POST",
-				path:     "/signin/phone",
-				handlers: []gin.HandlerFunc{controller.DriverPhoneLogin},
+				path:     "/signin",
+				handlers: []gin.HandlerFunc{controller.DriverEmailLogin},
 			},
 		},
 	},
@@ -451,6 +451,21 @@ var Routes []GroupRoute = []GroupRoute{
 				method:   "POST",
 				path:     "/file",
 				handlers: []gin.HandlerFunc{controller.UploadFile},
+			},
+		},
+	},
+	{
+		prefix: "/verify",
+		routes: []Route{
+			{
+				method:   "POST",
+				path:     "/email",
+				handlers: []gin.HandlerFunc{controller.VerifyOtpEmail},
+			},
+			{
+				method:   "POST",
+				path:     "/phone",
+				handlers: []gin.HandlerFunc{controller.VerifyOtpPhone},
 			},
 		},
 	},

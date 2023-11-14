@@ -54,7 +54,7 @@ func ConnectDB() {
 	CreateIndex("email", CustomerCollection)
 	CreateIndex("phone", DriverCollection)
 	CreateIndex("business_name", MerchantCollection)
-	CreateIndex("business_phone", MerchantCollection)
+	CreateIndex("business_email", MerchantCollection)
 	CreateGeoIndex("location", MerchantCollection)
 	CreateGeoIndex("dropoff_location", OrderCollection)
 	CreateGeoIndex("pickup_location", OrderCollection)

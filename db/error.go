@@ -42,11 +42,11 @@ func DBErrorHandler(err error) *ErrorResponse {
 			switch we.Code {
 			// duplicate filed
 			case 11000:
-				var field string = strings.Split(strings.Split(we.Message, "dup key: {")[1], "}")[0]
+				// var field string = strings.Split(strings.Split(we.Message, "dup key: {")[1], "}")[0]
 
 				return &ErrorResponse{
 					Status:  409,
-					Message: fmt.Errorf(field),
+					Message: err,
 				}
 			// Can't extract geo keys
 			case 16755:

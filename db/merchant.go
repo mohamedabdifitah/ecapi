@@ -145,8 +145,8 @@ func (m *Merchant) ChangeMetadataLogin() error {
 	_, err := MerchantCollection.UpdateOne(Ctx, query, update)
 	return err
 }
-func MerchantLoginCheck(phone string, password string, device Device) (*TokenResponse, *ErrorResponse) {
-	query := bson.M{"business_phone": phone}
+func MerchantLoginCheck(email string, password string, device Device) (*TokenResponse, *ErrorResponse) {
+	query := bson.M{"business_email": email}
 	var merchant Merchant
 	result := MerchantCollection.FindOne(Ctx, query)
 	err := result.Decode(&merchant)

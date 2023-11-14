@@ -21,5 +21,6 @@ func main() {
 	service.InitRedisClient()
 	db.ConnectDB()
 	service.InitMelliClient()
+	go service.InitAmqp()
 	api.Initserver()
 }

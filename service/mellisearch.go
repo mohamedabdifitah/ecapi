@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/meilisearch/meilisearch-go"
@@ -14,6 +15,10 @@ func InitMelliClient() {
 		Host:   "http://localhost:7700",
 		APIKey: os.Getenv("MELLI_API_KEY"),
 	})
+	_, err := Melli.Health()
+	if err != nil {
+		log.Fatalf("Failed to connect to MeiliSearch: %v", err)
+	}
 	fmt.Println("Melli client initialized")
 }
 func AddDocument(index string, data interface{}) error {

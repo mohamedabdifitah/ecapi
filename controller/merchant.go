@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
+	"github.com/mohamedabdifitah/ecapi/service"
 	"github.com/mohamedabdifitah/ecapi/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -39,15 +40,15 @@ func GetMerchant(c *gin.Context) {
 	}
 	c.JSON(200, merchant)
 }
-func SignUpMerchantWithPhone(c *gin.Context) {
-	var body *SignUpMerchantWithPhoneBody
+func SignUpMerchant(c *gin.Context) {
+	var body *SignUpMerchantBody
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
 		c.String(400, err.Error())
 		return
 	}
 	merchant := db.Merchant{
-		BusinessPhone: body.BusinessPhone,
+		BusinessEmail: body.BusinessEmail,
 		Password:      body.Password,
 		BusinessName:  body.BusinessName,
 		Location: db.Location{
@@ -55,7 +56,7 @@ func SignUpMerchantWithPhone(c *gin.Context) {
 			Coordinates: body.Location,
 		},
 		Metadata: db.AccountMetadata{
-			Provider: "phone",
+			Provider: "email",
 		},
 	}
 	res, erres := merchant.Save()
@@ -68,6 +69,10 @@ func SignUpMerchantWithPhone(c *gin.Context) {
 		// c.JSON(500, err.Error())
 		return
 	}
+	var info map[string]string = make(map[string]string)
+	info["rec"] = merchant.BusinessEmail
+	info["type"] = "email"
+	go service.ProduceMessage("", "verification", "", info)
 	c.JSON(201, res)
 }
 func UpdateMerchant(c *gin.Context) {
@@ -190,7 +195,7 @@ func MerchantPhoneLogin(c *gin.Context) {
 		DeviceId: c.GetHeader("device_id"),
 		Kind:     c.GetHeader("device_kind"),
 	}
-	tokens, ErrorResponse := db.MerchantLoginCheck(body.Phone, body.Password, device)
+	tokens, ErrorResponse := db.MerchantLoginCheck(body.Email, body.Password, device)
 	if ErrorResponse != nil {
 		ErrorResponse.Error(c)
 		return

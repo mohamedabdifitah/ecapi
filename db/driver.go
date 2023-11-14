@@ -146,8 +146,8 @@ func (d *Driver) ChangeMetadataLogin() error {
 	_, err := DriverCollection.UpdateOne(Ctx, query, update)
 	return err
 }
-func DriverLoginCheck(phone string, password string, device Device) (*TokenResponse, *ErrorResponse) {
-	query := bson.M{"phone": phone}
+func DriverLoginCheck(email string, password string, device Device) (*TokenResponse, *ErrorResponse) {
+	query := bson.M{"email": email}
 	var driver Driver
 	result := DriverCollection.FindOne(Ctx, query)
 	err := result.Decode(&driver)

@@ -1,9 +1,10 @@
+# Makefile
 # setting developemnt flag 
 export APP_ENV = development
 $ENV:APP_ENV = "development"
 db:
-	meilisearch --master-key 4eh9oD6BRbTftjnsjBCd0SOO3jGmO_-x6ZAQo6Mbr3c
+	cd C:\Melli && meilisearch --master-key hAHhoSkUf1KM2STEW0X5wAo755pMnr6DiRqYrQ1d3H8
 dev:
-	go run .
+	nodemon --exec go run . --signal SIGTERM
 test:
 	go test ./...

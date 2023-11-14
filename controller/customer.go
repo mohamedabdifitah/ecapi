@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
+	"github.com/mohamedabdifitah/ecapi/service"
 	"github.com/mohamedabdifitah/ecapi/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -58,6 +59,10 @@ func SignUpCustomerWithEmail(c *gin.Context) {
 		c.JSON(eres.Status, eres.Message)
 		return
 	}
+	var info map[string]string = make(map[string]string)
+	info["rec"] = customer.Email
+	info["type"] = "email"
+	go service.ProduceMessage("", "verification", "", info)
 	c.JSON(201, res.InsertedID)
 }
 func CompleteSignUp(c *gin.Context) {

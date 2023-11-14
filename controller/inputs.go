@@ -29,8 +29,8 @@ type EmailLoginBody struct {
 	DeviceId string `json:"device_id"`
 	Kind     string `json:"kind"`
 }
-type SignUpMerchantWithPhoneBody struct {
-	BusinessPhone string    `json:"business_phone" binding:"required"`
+type SignUpMerchantBody struct {
+	BusinessEmail string    `json:"business_email" binding:"required"`
 	BusinessName  string    `json:"business_name" binding:"required"`
 	Password      string    `json:"password" binding:"required"`
 	Location      []float64 `json:"location" binding:"required"`
@@ -49,7 +49,7 @@ type ChangePhonedBody struct {
 	OldPhone string `json:"old_phone"`
 }
 type PhoneLoginBody struct {
-	Phone    string `json:"phone"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 type DriverBody struct {
@@ -58,8 +58,8 @@ type DriverBody struct {
 	Address   string `json:"address"`
 }
 type SignUpWithDriverBody struct {
-	Phone    string `json:"phone"`
-	Emai     string `json:"email"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 type MenuBody struct {

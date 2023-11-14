@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -203,11 +202,7 @@ func MerchantOrderAccept(c *gin.Context) {
 		c.String(400, "order is not found")
 		return
 	}
-	err = service.PublishTopic("merchant_accpted_order", order)
-	if err != nil {
-		c.String(500, "server error , please try again")
-		return
-	}
+	go service.ProduceMessage("", "merchant_accpted_order", "", order)
 	c.JSON(200, res)
 }
 func AssignOrderToDriver(c *gin.Context) {
@@ -315,12 +310,7 @@ func CancelOrder(c *gin.Context) {
 	if err != nil {
 		c.String(500, "internal error")
 	}
-	err = service.PublishTopic("order_canceled", order)
-	if err != nil {
-		c.String(500, err.Error())
-		return
-	}
-
+	go service.ProduceMessage("", "order_canceled", "", order)
 	c.JSON(200, res)
 }
 func RejectOrderByMerchant(c *gin.Context) {
@@ -387,11 +377,7 @@ func RejectOrderByMerchant(c *gin.Context) {
 		c.String(500, "internal error fetch order")
 		return
 	}
-	err = service.PublishTopic("order_canceled", order)
-	if err != nil {
-		c.String(500, err.Error())
-		return
-	}
+	go service.ProduceMessage("", "order_canceled", "", order)
 	c.JSON(200, res)
 }
 func DropOrderByDriver(c *gin.Context) {
@@ -465,13 +451,7 @@ func ChangeOrderStatus(stage string) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		fmt.Println("order_" + stage)
-		err = service.PublishTopic("order_"+stage, order)
-		if err != nil {
-			c.String(500, "internal error , please try again")
-			c.Abort()
-			return
-		}
+		go service.ProduceMessage("", "order_"+stage, "", order)
 		c.JSON(200, res)
 		c.Abort()
 	}
@@ -504,10 +484,6 @@ func OrderIsDelivered(c *gin.Context) {
 		c.String(400, err.Error())
 		return
 	}
-	err = service.PublishTopic("order_delivered", order)
-	if err != nil {
-		c.String(500, "internal error , please try again")
-		return
-	}
+	go service.ProduceMessage("", "order_delivered", "", order)
 	c.JSON(200, res)
 }
