@@ -24,8 +24,7 @@ func GetAllDrivers(c *gin.Context) {
 	c.JSON(http.StatusOK, drivers)
 }
 func GetDriver(c *gin.Context) {
-	var id string
-	id = c.Param("id")
+	var id string = c.Param("id")
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.String(400, "Invalid Id")

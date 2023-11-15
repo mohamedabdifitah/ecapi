@@ -198,7 +198,7 @@ func MerchantLoginCheck(email string, password string, device Device) (*TokenRes
 	}
 	return t, nil
 }
-func (m *Merchant) GetMerchantByLocation(location []float64, maxdist int64, mindist int64) ([]*Merchant, error) {
+func GetMerchantByLocation(location []float64, maxdist int, mindist int) ([]*Merchant, error) {
 	var merchants []*Merchant
 	filter := bson.D{
 		{Key: "location", Value: bson.D{
@@ -247,4 +247,23 @@ func UpdateMerchant(query bson.M, change bson.D) (*mongo.UpdateResult, error) {
 		return nil, err
 	}
 	return res, err
+}
+func FilterMerchants(query bson.D, option *options.FindOptions) ([]*Merchant, error) {
+	var merchants []*Merchant
+	cursor, err := MerchantCollection.Find(Ctx, query, options.Find().SetProjection(ProtectFields(CommonProtoctedFields)), option)
+	if err != nil {
+		return nil, err
+	}
+	for cursor.Next(Ctx) {
+		var merchant *Merchant
+		err := cursor.Decode(&merchant)
+		if err != nil {
+
+			return nil, err
+
+		}
+		merchants = append(merchants, merchant)
+	}
+	cursor.Close(Ctx)
+	return merchants, nil
 }

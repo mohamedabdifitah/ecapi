@@ -66,7 +66,7 @@ type MenuBody struct {
 	Title        string        `json:"title" bson:"title"`             // Burger
 	Description  string        `json:"description" bson:"description"` // Chicken fries contains
 	Status       string        `json:"status" bson:"status"`           // available , unavailable , banned
-	Category     []string      `json:"category" bson:"category"`       // fast food , drink ,                     // Images of the product urls
+	Category     string        `json:"category" bson:"category"`       // fast food , drink ,                     // Images of the product urls
 	Price        uint          `json:"price" bson:"price"`             // the price of the product is represented as cents 99 = $0.99
 	Attributes   db.Attributes `json:"attributes" bson:"attributes"`
 	Reciepe      []string      `json:"reciepe" bson:"reciepe"`
@@ -74,16 +74,14 @@ type MenuBody struct {
 	Images       []string      `json:"images"`
 }
 type ReviewBody struct {
-	OrderId        string             `json:"order_id"`
-	Rate           uint               `json:"rate"`
-	MerchantReview ReviewExternalBody `json:"merchant_review"`
-	DriverReview   ReviewExternalBody `json:"driver_review"`
-	From           string             `json:"from"`
+	OrderId    string   `json:"order_id"`
+	Rate       uint     `json:"rate"`
+	Message    string   `json:"message"`
+	ExternalId string   `json:"external_id"`
+	From       string   `json:"from"`
+	Options    []string `json:"options"`
 }
 type ReviewExternalBody struct {
-	Rate       float64 `json:"rate" binding:"gte=1"`
-	Message    string  `json:"message"`
-	ExternalId string  `json:"external_id"`
 }
 type PlaceOrderBody struct {
 	Items              []Item    `json:"items"`
@@ -103,4 +101,13 @@ type Item struct {
 type AccOrderMerchantBody struct {
 	OrderId    string `json:"order_id"`
 	MerchantId string `json:"merchant_id"`
+}
+type FilterMerchantsBody struct {
+	Location [2]float64 `json:"location"`
+	Near     int        `json:"near"`
+	Popular  bool       `json:"popular"`
+	Rate     float32    `json:"rate"`
+}
+type Filter struct {
+	On bool `json:"on"`
 }

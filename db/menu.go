@@ -144,3 +144,22 @@ func (m Menu) SetImages() (*mongo.UpdateResult, error) {
 	}
 	return result, nil
 }
+func GetMenues(query bson.D) ([]*Menu, error) {
+	var menus []*Menu
+	cursor, err := MenuCollection.Find(Ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	for cursor.Next(Ctx) {
+		var menu *Menu
+		err := cursor.Decode(&menu)
+		if err != nil {
+
+			return nil, err
+
+		}
+		menus = append(menus, menu)
+	}
+	cursor.Close(Ctx)
+	return menus, nil
+}

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mohamedabdifitah/ecapi/db"
@@ -11,35 +12,39 @@ import (
 
 func GetUserReviews(c *gin.Context) {
 	id := c.Param("id")
-	reviews, err := db.GetReviewsByUser(id)
+	filter := bson.D{
+		{Key: "from", Value: id},
+	}
+	reviews, err := db.GetReviews(filter)
 	if err != nil {
 		c.JSON(400, err)
+		return
 	}
 	c.JSON(200, reviews)
 }
-func GetReviewMerchant(c *gin.Context) {
-	ExternalId := c.Param("id")
-	// bson.D{{"merchant_review.external_id", "64ea387416182c259943067b"}}
-	reviews, err := db.GetReviewsToInstance("merchant_review.external_id", ExternalId)
-	if err != nil {
-		c.JSON(500, err)
+func GetReviewToInstace(Type string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ExternalId := c.Param("id")
+		filter := bson.D{
+			{Key: "Type", Value: Type},
+			{Key: "external_id", Value: ExternalId},
+		}
+		reviews, err := db.GetReviews(filter)
+		if err != nil {
+			c.JSON(400, err)
+			c.Abort()
+			return
+		}
+		c.JSON(200, reviews)
+		c.Abort()
 	}
-	c.JSON(200, reviews)
+}
 
-}
-func GetReviewDriver(c *gin.Context) {
-	ExternalId := c.Param("id")
-	reviews, err := db.GetReviewsToInstance("driver_review.external_id", ExternalId)
-	if err != nil {
-		c.JSON(500, err)
-	}
-	c.JSON(200, reviews)
-
-}
 func GetAllReview(c *gin.Context) {
-	reviews, err := db.GetAllReviews(bson.D{})
+	reviews, err := db.GetReviews(bson.D{})
 	if err != nil {
 		c.JSON(500, err)
+		return
 	}
 	c.JSON(200, reviews)
 }
@@ -51,18 +56,12 @@ func CreateReview(c *gin.Context) {
 		return
 	}
 	review := &db.Review{
-		From: body.From,
-		MerchantReview: db.ReviewColl{
-			Rate:       body.MerchantReview.Rate,
-			Message:    body.MerchantReview.ExternalId,
-			ExternalId: body.MerchantReview.ExternalId,
-		},
-		OrderId: body.OrderId,
-		DriverReview: db.ReviewColl{
-			Rate:       body.DriverReview.Rate,
-			Message:    body.MerchantReview.ExternalId,
-			ExternalId: body.MerchantReview.ExternalId,
-		},
+		From:       body.From,
+		Rate:       body.Rate,
+		Message:    body.Message,
+		ExternalId: body.ExternalId,
+		OrderId:    body.OrderId,
+		Options:    body.Options,
 	}
 	res, err := review.Create()
 	if err != nil {
@@ -78,10 +77,7 @@ func GetReviewById(c *gin.Context) {
 		c.String(400, "invalid id")
 		return
 	}
-	review := &db.Review{
-		Id: objecId,
-	}
-	err = review.GetById()
+	review, err := db.GetReviewById(objecId)
 	if err != nil {
 		if err.Error() == "mongo: no documents in result" {
 			c.String(200, "review not found")
@@ -105,10 +101,14 @@ func UpdateReview(c *gin.Context) {
 		c.String(400, err.Error())
 		return
 	}
-	review := &db.Review{
-		Id: objecId,
-	}
-	res, err := review.Update()
+	filter := bson.M{"_id": objecId}
+	update := bson.D{{Key: "$set", Value: bson.D{
+		{Key: "message", Value: body.Message},
+		{Key: "rate", Value: body.Rate},
+		{Key: "options", Value: body.Options},
+		{Key: "metadata.updated_at", Value: time.Now().UTC()},
+	}}}
+	res, err := db.ReviewUpdate(filter, update)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -131,10 +131,7 @@ func DeleteReview(c *gin.Context) {
 		c.String(400, "Invalid id")
 		return
 	}
-	review := db.Review{
-		Id: objecId,
-	}
-	res, err := review.Delete()
+	res, err := db.DeleteReview(objecId)
 	if err != nil {
 		c.String(500, err.Error())
 		return

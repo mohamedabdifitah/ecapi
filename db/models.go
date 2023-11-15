@@ -19,7 +19,7 @@ type Menu struct {
 	Title               string             `json:"title" bson:"title" binding:"max=30,min=1"` // Burger
 	Description         string             `json:"description" bson:"description"`            // Chicken fries contains
 	Status              string             `json:"status" bson:"status"`                      // available , unavailable , banned
-	Category            []string           `json:"category" bson:"category"`                  // fast food , drink ,
+	Category            string             `json:"category" bson:"category"`                  // fast food , drink ,
 	Images              []string           `json:"images" bson:"images"`                      // Images of the product urls
 	Price               uint               `json:"price" bson:"price"`                        // the price of the product is represented as cents 99 = $0.99
 	Attributes          Attributes         `json:"attributes" bson:"attributes"`
@@ -29,6 +29,13 @@ type Menu struct {
 	Barcode             string             `json:"-" bson:"barcode"`                   // if this needed
 	EstimateTime        int                `json:"estimate_time" bson:"estimate_time"` // estimate of preparation and cooking time in seconds
 	ServiceAvailability []ActiveDays       ` json:"service_availablity" bson:"service_availablity"`
+	Likes               uint               `json:"likes" bson:"likes"` //
+}
+type Category struct {
+	Id          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Title       string             `json:"title" bson:"title"`
+	Description string             `json:"description" bson:"description"`
+	Icon        string             `json:"icon" bson:"icon"`
 }
 type Metadata struct {
 	CreatedAt time.Time `json:"created_at" bson:"created_at"`
@@ -85,8 +92,8 @@ type Customer struct {
 type AccountMetadata struct {
 	TokenVersion    int       `bson:"token_version" json:"-"`
 	CreatedAt       time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at" bson:"updated_at"`
-	LasLogin        time.Time `bson:"last_login" json:"last_login"`
+	UpdatedAt       time.Time `json:"-" bson:"updated_at"`
+	LasLogin        time.Time `bson:"last_login" json:"-"`
 	WebhookEndpoint string    `json:"webhook_endpoint" bson:"webhook_endpoint"`
 	Provider        string    `bson:"provider" json:"-"` // google , email , facebook
 }
@@ -131,23 +138,23 @@ type Merchant struct {
 	Closed        bool               `json:"closed" bson:"closed"`
 	ActiveDays    []ActiveDays       `json:"active_days" bson:"active_days"`
 	Generes       []string           `bson:"generes" json:"generes"` //Fast food.Fast casual.Casual dining / Slow Casual.Premium casual.Family style.Fine dining.
+	Likes         uint               `bson:"likes" json:"likes"`
+	Popular       uint               `bson:"popular" json:"popular"`
 }
 type ActiveDays struct {
 	TimeOperatorStart float32 `bson:"time_operation_start" json:"time_operation_start"` // 7.10 => 07:19 UTC
 	TimeOperatorEnd   float32 `bson:"time_operation_end" json:"time_operation_end"`
 }
 type Review struct {
-	Id             primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65
-	OrderId        string             `bson:"order_id" json:"order_id"`
-	MerchantReview ReviewColl         `bson:"merchant_review" json:"merchant_review"`
-	DriverReview   ReviewColl         `bson:"driver_review" json:"driver_review"`
-	From           string             `bson:"from" json:"from"`
-	Metadata       Metadata           `bson:"metadata" json:"metadata"`
-}
-type ReviewColl struct {
-	Message    string  `bson:"message" json:"message"`
-	Rate       float64 `bson:"rate" json:"rate"`
-	ExternalId string  `bson:"external_id" json:"external_id"`
+	Id         primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"` // 63f642ac061b6f5f089b3a65
+	Type       string             `bson:"type" json:"type"`                  // REVIEW_MERCHANT , REVIEW_DRIVER , REVIEW_MENU
+	OrderId    string             `bson:"order_id" json:"order_id"`
+	From       string             `bson:"from" json:"from"`
+	Message    string             `bson:"message" json:"message"`
+	Rate       uint               `bson:"rate" json:"rate"`
+	ExternalId string             `bson:"external_id" json:"external_id"`
+	Options    []string           `bson:"options" json:"options"`
+	Metadata   Metadata           `bson:"metadata" json:"metadata"`
 }
 type Coupon struct {
 	Token             string    `json:"token" bson:"token"`
@@ -164,8 +171,8 @@ type Location struct {
 	Coordinates []float64 `bson:"coordinates" json:"coordinates"`
 }
 type Rate struct {
-	Rate         float64 `bson:"rate" json:"rate"`
-	ScoreStats   []int   `bson:"stats" json:"-"`
+	Rate         float32 `bson:"rate" json:"rate"`
+	ScoreStats   []int   `bson:"stats" json:"-"` // [20,20,0,10,5]
 	Participants uint    `bson:"participants" json:"participants"`
 }
 type Badge struct {

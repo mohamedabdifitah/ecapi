@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +11,7 @@ import (
 	"github.com/mohamedabdifitah/ecapi/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func GetAllMerchants(c *gin.Context) {
@@ -23,8 +24,7 @@ func GetAllMerchants(c *gin.Context) {
 	c.JSON(http.StatusOK, merchants)
 }
 func GetMerchant(c *gin.Context) {
-	var id string
-	id = c.Param("id")
+	var id string = c.Param("id")
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.String(400, "Invalid Id")
@@ -203,20 +203,15 @@ func MerchantPhoneLogin(c *gin.Context) {
 	c.JSON(200, tokens)
 }
 func GetMerchantByLocation(c *gin.Context) {
-	longtitude, err := strconv.ParseFloat(c.Query("lang"), 64)
-	latitude, err := strconv.ParseFloat(c.Query("lat"), 64)
-	mindist, err := strconv.ParseInt(c.Query("mindist"), 0, 64)
-	maxdist, err := strconv.ParseInt(c.Query("maxdist"), 0, 64)
-	if err != nil {
-		c.String(400, err.Error())
-		return
-	}
-	var merchant db.Merchant
-	location := []float64{
+	longtitude := 3.0
+	latitude := 3.0
+	mindist := 10 //strconv.ParseInt(c.Query("mindist"), 0, 32)
+	maxdist := 30
+	location := [2]float64{
 		longtitude,
 		latitude,
 	}
-	merchants, err := merchant.GetMerchantByLocation(location, maxdist, mindist)
+	merchants, err := db.GetMerchantByLocation(location[:], maxdist, mindist)
 	if err != nil {
 		c.String(500, err.Error())
 		return
@@ -316,4 +311,64 @@ func ChangeMerchantWebhooks(c *gin.Context) {
 		return
 	}
 	c.JSON(200, res)
+}
+func FilterMerchants(c *gin.Context) {
+	// 1km == 5 ,
+	var body FilterMerchantsBody
+	err := c.ShouldBindJSON(&body)
+	if err != nil {
+		c.String(400, "validation:", err.Error())
+		return
+	}
+	var query bson.D = bson.D{}
+	var option *options.FindOptions
+	if body.Popular {
+		option = options.Find().SetSort(bson.D{{Key: "likes", Value: -1}})
+	}
+	if body.Near != 0 {
+		maxdist := body.Near / 5 * 1000
+		filter := bson.D{
+			{Key: "location", Value: bson.D{
+				{
+					Key: "$near", Value: bson.D{
+						{
+							Key: "$maxDistance", Value: maxdist,
+						},
+						{
+							Key: "$minDistance", Value: 0,
+						},
+						{
+							Key: "$geometry", Value: bson.D{
+								{
+									Key: "type", Value: "Point",
+								},
+								{
+									Key: "coordinates", Value: body.Location,
+								},
+							},
+						},
+					},
+				},
+			},
+			},
+		}
+		query = append(query, filter...)
+	}
+
+	if body.Rate != 0 {
+		fmt.Println("rating: ", body.Rate)
+		filter := bson.D{
+			{
+				Key: "rate.rate", Value: body.Rate,
+			},
+		}
+		query = append(query, filter...)
+	}
+	merchants, err := db.FilterMerchants(query, option)
+	if err != nil {
+		c.String(400, err.Error())
+		return
+	}
+
+	c.JSON(200, merchants)
 }

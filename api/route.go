@@ -16,6 +16,7 @@ type Route struct {
 	handlers []gin.HandlerFunc
 }
 
+// TODO: implement validation of body , params and quaery and headers for preventing errors smooth expereicne for api users.
 func (r *GroupRoute) register() {
 	for _, route := range r.routes {
 		switch route.method {
@@ -125,12 +126,17 @@ var Routes []GroupRoute = []GroupRoute{
 			{
 				method:   "GET",
 				path:     "/merchant/:id",
-				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{}), controller.GetReviewMerchant},
+				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{}), controller.GetReviewToInstace("REVIEW_MERCHANT")},
 			},
 			{
 				method:   "GET",
 				path:     "/driver/:id",
-				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{}), controller.GetReviewDriver},
+				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{}), controller.GetReviewToInstace("REVIEW_DRIVER")},
+			},
+			{
+				method:   "GET",
+				path:     "/menu/:id",
+				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{}), controller.GetReviewToInstace("REVIEW_MENU")},
 			},
 			{
 				method:   "GET",
@@ -346,6 +352,11 @@ var Routes []GroupRoute = []GroupRoute{
 				method:   "POST",
 				path:     "/signin/phone",
 				handlers: []gin.HandlerFunc{controller.MerchantPhoneLogin},
+			},
+			{
+				method:   "GET",
+				path:     "/filter",
+				handlers: []gin.HandlerFunc{controller.FilterMerchants},
 			},
 		},
 	},

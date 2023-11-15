@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+// TODO: support db validation and error handling which almost return description what error happened
 var (
 	Mongoclient *mongo.Client
 	Ctx         context.Context
@@ -24,6 +25,7 @@ var (
 	MerchantCollection *mongo.Collection
 	MenuCollection     *mongo.Collection
 	ReviewCollection   *mongo.Collection
+	CategoryCollection *mongo.Collection
 )
 
 func ConnectDB() {
@@ -51,6 +53,7 @@ func ConnectDB() {
 	MenuCollection = ResturantDB.Collection("menu")
 	ReviewCollection = ResturantDB.Collection("review")
 	OrderCollection = ResturantDB.Collection("order")
+	CategoryCollection = ResturantDB.Collection("category")
 	CreateIndex("email", CustomerCollection)
 	CreateIndex("phone", DriverCollection)
 	CreateIndex("business_name", MerchantCollection)
@@ -60,6 +63,7 @@ func ConnectDB() {
 	CreateGeoIndex("pickup_location", OrderCollection)
 	CreateGeoIndex("location", DriverCollection)
 	CreateIndex("order_id", ReviewCollection)
+	CreateIndex("title", CategoryCollection)
 }
 func CloseDB() error {
 	// Ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
