@@ -135,6 +135,7 @@ func GetOrderByDriver(c *gin.Context) {
 	c.JSON(200, orders)
 }
 func GetOrderByLocation(c *gin.Context) {
+	// TODO: implement location query best practices
 	longtitude, err := strconv.ParseFloat(c.Query("lang"), 64)
 	latitude, err := strconv.ParseFloat(c.Query("lat"), 64)
 	mindist, err := strconv.ParseInt(c.Query("mindist"), 0, 32)

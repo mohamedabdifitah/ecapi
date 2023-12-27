@@ -17,7 +17,10 @@ func InitMelliClient() {
 	})
 	_, err := Melli.Health()
 	if err != nil {
-		log.Fatalf("Failed to connect to MeiliSearch: %v", err)
+		if os.Getenv("APP_ENV") != "development" {
+
+			log.Fatalf("Failed to connect to MeiliSearch: %v", err)
+		}
 	}
 	fmt.Println("Melli client initialized")
 }

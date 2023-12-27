@@ -6,6 +6,7 @@ import (
 
 	"github.com/mohamedabdifitah/ecapi/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
@@ -192,4 +193,63 @@ func UpdateCustomer(query bson.M, change bson.D) (*mongo.UpdateResult, error) {
 		return nil, err
 	}
 	return res, nil
+}
+func GoogleLogin(data GoogleUserInfoType) (*TokenResponse, *ErrorResponse) {
+	query := bson.M{"email": data.Email}
+	var customer Customer
+	result := CustomerCollection.FindOne(Ctx, query)
+	err = result.Decode(&customer)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			var user Customer = Customer{
+				Email:      data.Email,
+				FamilyName: data.FamilyName,
+				GivenName:  data.GivenName,
+				Profile:    data.Picture,
+				Metadata: AccountMetadata{
+					Provider: "Google",
+				},
+			}
+			result, err := user.Save()
+			if err != nil {
+				return nil, &ErrorResponse{}
+			}
+			var customer Customer = Customer{
+				Id: result.InsertedID.(primitive.ObjectID),
+			}
+			err = customer.GetById()
+			if err != nil {
+				return nil, &ErrorResponse{Status: 500, Message: err, Type: "string"}
+			}
+			t, erres := TokenGenerate(customer.Email, customer.Id, customer.Metadata.TokenVersion)
+			return t, erres
+		} else {
+			return nil, &ErrorResponse{Status: 500, Message: err, Type: "string"}
+		}
+	}
+	t, erres := TokenGenerate(customer.Email, customer.Id, customer.Metadata.TokenVersion)
+	return t, erres
+}
+func TokenGenerate(email string, id primitive.ObjectID, tokenVersion int) (*TokenResponse, *ErrorResponse) {
+	idToken, err := utils.GenerateRefreshToken(email, id, tokenVersion)
+	if err != nil {
+		res := &ErrorResponse{
+			Status:  500,
+			Message: err,
+		}
+		return nil, res
+	}
+	token, err := utils.GenerateAccessToken(email, id, Roles[0])
+	if err != nil {
+		res := &ErrorResponse{
+			Status:  500,
+			Message: err,
+		}
+		return nil, res
+	}
+	t := &TokenResponse{
+		RefreshToken: idToken,
+		AccessToken:  token,
+	}
+	return t, nil
 }

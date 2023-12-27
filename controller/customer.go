@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"context"
+	"encoding/json"
+	"io"
 	"net/http"
 	"time"
 
@@ -11,6 +14,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+// TODO: Oauth2 with google
+// TODO: also cleanup the artitechtuer
+// TODO: response mechanism for json / html
 
 func GetAllCustomers(c *gin.Context) {
 	var customer *db.Customer
@@ -304,4 +311,59 @@ func ChangeCustomerWebhooks(c *gin.Context) {
 		return
 	}
 	c.JSON(200, res)
+}
+
+// GoogleCallBack function after SiginWithGoogle or SiginUpWithGoogle
+func GoogleCallBack(c *gin.Context) {
+	state := c.Query("state")
+	if state != "state" {
+		c.String(http.StatusBadRequest, "Invalid request state")
+		return
+	}
+	code := c.Query("code")
+
+	googleConfig := SetupConfig()
+
+	token, err := googleConfig.Exchange(context.Background(), code)
+	if err != nil {
+		c.String(http.StatusBadRequest, "token exchange failed")
+		return
+	}
+	client := &http.Client{
+		// CheckRedirect: r,
+	}
+	req, err := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo", nil)
+	var key string = "Bearer " + token.AccessToken
+	req.Header.Set("Authorization", key)
+	req.Header.Set("Content-Type", "application/json")
+	if err != nil {
+		c.String(400, "Request failed")
+		return
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		c.String(http.StatusBadRequest, "failed to get user credentials")
+		return
+	}
+	userData, err := io.ReadAll(res.Body)
+	if err != nil {
+		c.String(http.StatusBadRequest, "failed to parse format response")
+		return
+	}
+	var GoogleUserData db.GoogleUserInfoType
+	err = json.Unmarshal(userData, &GoogleUserData)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	t, erres := db.GoogleLogin(GoogleUserData)
+	if erres != nil {
+		if erres.Type == "string" {
+			c.String(erres.Status, erres.Message.Error())
+			return
+		}
+		c.JSON(erres.Status, erres.Message)
+		return
+	}
+	c.JSON(200, t)
 }

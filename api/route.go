@@ -64,6 +64,11 @@ var Routes []GroupRoute = []GroupRoute{
 				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{}), controller.GetCustomer},
 			},
 			{
+				method:   "GET",
+				path:     "/signin/google",
+				handlers: []gin.HandlerFunc{controller.SiginWithGoogle},
+			},
+			{
 				method:   "PUT",
 				path:     "/update/:id",
 				handlers: []gin.HandlerFunc{middleware.AuthorizeRolesMiddleware([]string{"admin", "customer"}), controller.UpdateCustomer},
@@ -452,6 +457,11 @@ var Routes []GroupRoute = []GroupRoute{
 				method:   "GET",
 				path:     "multisearch",
 				handlers: []gin.HandlerFunc{controller.MultiSearch},
+			},
+			{
+				method:   "GET",
+				path:     "callback/google",
+				handlers: []gin.HandlerFunc{controller.GoogleCallBack},
 			},
 		},
 	},

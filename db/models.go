@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// TODO: support attributes for basic types and custom type for menues.
 // all this values are represented as cm or centimeter as unit type
 type Attributes struct {
 	Volume float64 `bson:"volume" json:"volume"`

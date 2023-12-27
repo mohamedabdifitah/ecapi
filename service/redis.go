@@ -20,11 +20,13 @@ func InitRedisClient() {
 		Password: os.Getenv("REDIS_PASS"), // no password set
 		DB:       0,                       // use default DB
 	})
-	if err := RedisClient.Ping(Ctx).Err(); err != nil {
-		if os.Getenv("GIN_MODE") == "release" {
-			log.Fatal(err)
+	if os.Getenv("APP_ENV") != "development" {
+		if err := RedisClient.Ping(Ctx).Err(); err != nil {
+			if os.Getenv("GIN_MODE") == "release" {
+				log.Fatal(err)
+			}
+			fmt.Println(err)
 		}
-		fmt.Println(err)
 	}
 	fmt.Println("redis connection established")
 }
